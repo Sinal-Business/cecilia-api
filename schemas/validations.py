@@ -1,4 +1,5 @@
 from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -14,6 +15,7 @@ class ValidateDocumentInput(BaseModel):
         description="Documento a ser validado. Para CPF, envie apenas números. Para CNPJ, envie apenas letras e números, sem pontos, barras, traços ou espaços.",
         examples=["12345678909"]
     )
+
 
 class ValidateDocumentResponse(BaseModel):
     ok: bool = Field(
