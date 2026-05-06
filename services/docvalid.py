@@ -8,28 +8,28 @@ def validate_cpf(value: str):
         return (
             False,
             "CPF_INVALID_EMPTY",
-            "Não identifiquei o CPF informado. Por favor, envie apenas os números do seu CPF."
+            "Não identifiquei o CPF. Por favor, me envie apenas os números 😊"
         )
 
     if not re.fullmatch(r"\d+", cpf):
         return (
             False,
             "CPF_INVALID_FORMAT",
-            "Parece que você enviou um CPF com caracteres especiais, letras ou espaços. Por favor, envie apenas os números do seu CPF."
+            "Parece que você enviou um CPF com letras, símbolos ou espaços. Por favor, me envie apenas os números 😊"
         )
 
     if len(cpf) != 11:
         return (
             False,
             "CPF_INVALID_LENGTH",
-            "O CPF precisa ter exatamente 11 dígitos. Por favor, confira e envie novamente apenas os números."
+            "O CPF precisa ter exatamente 11 dígitos. Você pode por favor conferir e me mandar novamente? 😊"
         )
 
     if cpf == cpf[0] * 11:
         return (
             False,
             "CPF_INVALID_DIGITS",
-            "O CPF informado não parece ser válido. Por favor, confira os números e envie novamente."
+            "O CPF informado não parece ser válido. Você pode por favor conferir e me mandar novamente? 😊"
         )
 
     def calc_digit(base, factor):
@@ -49,10 +49,10 @@ def validate_cpf(value: str):
         return (
             False,
             "CPF_INVALID_DIGITS",
-            "O CPF informado não parece ser válido. Por favor, confira os números e envie novamente."
+            "O CPF informado não parece ser válido. Você pode por favor conferir e me mandar novamente? 😊"
         )
 
-    return True, "CPF_VALID", None
+    return True, "CPF_VALID", "Obrigada 😊"
 
 
 def validate_cnpj(value: str):
@@ -62,28 +62,28 @@ def validate_cnpj(value: str):
         return (
             False,
             "CNPJ_INVALID_EMPTY",
-            "Não identifiquei o CNPJ informado. Por favor, envie o CNPJ novamente."
+            "Não identifiquei o CNPJ. Por favor, me envie o documento novamente 😊"
         )
 
     if not re.fullmatch(r"[A-Za-z0-9]+", cnpj):
         return (
             False,
             "CNPJ_INVALID_FORMAT",
-            "Parece que você enviou um CNPJ com caracteres especiais, pontuação ou espaços. Por favor, envie apenas letras e números."
+            "Parece que você enviou um CNPJ com símbolos, pontuação ou espaços. Por favor, me envie apenas os dígitos 😊"
         )
 
     if len(cnpj) != 14:
         return (
             False,
             "CNPJ_INVALID_LENGTH",
-            "O CNPJ precisa ter exatamente 14 caracteres. Por favor, confira e envie novamente."
+            "O CNPJ precisa ter exatamente 14 caracteres. Você pode por favor conferir e me mandar novamente? 😊"
         )
 
     if not re.fullmatch(r"\d{2}", cnpj[-2:]):
         return (
             False,
             "CNPJ_INVALID_FORMAT",
-            "Os dois últimos caracteres do CNPJ precisam ser números. Por favor, confira e envie novamente."
+            "Os dois últimos caracteres do CNPJ precisam ser números. Você pode por favor conferir e me mandar novamente? 😊"
         )
 
     cnpj_calc = cnpj.upper()
@@ -92,7 +92,7 @@ def validate_cnpj(value: str):
         return (
             False,
             "CNPJ_INVALID_DIGITS",
-            "O CNPJ informado não parece ser válido. Por favor, confira os caracteres e envie novamente."
+            "O CNPJ informado não parece ser válido. Você pode por favor conferir e me mandar novamente? 😊"
         )
 
     def char_value(char):
@@ -118,7 +118,7 @@ def validate_cnpj(value: str):
         return (
             False,
             "CNPJ_INVALID_DIGITS",
-            "O CNPJ informado não parece ser válido. Por favor, confira os caracteres e envie novamente."
+            "O CNPJ informado não parece ser válido. Você pode por favor conferir e me mandar novamente? 😊"
         )
 
-    return True, "CNPJ_VALID", None
+    return True, "CNPJ_VALID", "Obrigada 😊"

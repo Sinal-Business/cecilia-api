@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Body, Depends
-
 from core.auth import verify
 from schemas.validations import ValidateDocumentInput, ValidateDocumentResponse
 from services.docvalid import validate_cnpj, validate_cpf
@@ -10,8 +9,6 @@ router = APIRouter(
     tags=["General"],
     dependencies=[Depends(verify)]
 )
-
-
 @router.post(
     "/document",
     response_model=ValidateDocumentResponse,
@@ -58,7 +55,7 @@ Valida CPF ou CNPJ informado na requisição:
                             "value": {
                                 "valid_doc": True,
                                 "status": "CPF_VALID",
-                                "notes": None
+                                "notes": "Obrigada 😊"
                             }
                         },
                         "cpf_formato_invalido": {
@@ -66,7 +63,7 @@ Valida CPF ou CNPJ informado na requisição:
                             "value": {
                                 "valid_doc": False,
                                 "status": "CPF_INVALID_FORMAT",
-                                "notes": "Parece que você enviou um CPF com caracteres especiais, letras ou espaços. Por favor, envie apenas os números do seu CPF."
+                                "notes": "Parece que você enviou um CPF com letras, símbolos ou espaços. Por favor, me envie apenas os números 😊"
                             }
                         },
                         "cpf_quantidade_invalida": {
@@ -74,7 +71,7 @@ Valida CPF ou CNPJ informado na requisição:
                             "value": {
                                 "valid_doc": False,
                                 "status": "CPF_INVALID_LENGTH",
-                                "notes": "O CPF precisa ter exatamente 11 dígitos. Por favor, confira e envie novamente apenas os números."
+                                "notes": "O CPF precisa ter exatamente 11 dígitos. Você pode por favor conferir e me mandar novamente? 😊"
                             }
                         },
                         "cnpj_valido": {
@@ -82,7 +79,7 @@ Valida CPF ou CNPJ informado na requisição:
                             "value": {
                                 "valid_doc": True,
                                 "status": "CNPJ_VALID",
-                                "notes": None
+                                "notes": "Obrigada 😊"
                             }
                         },
                         "cnpj_formato_invalido": {
@@ -90,7 +87,7 @@ Valida CPF ou CNPJ informado na requisição:
                             "value": {
                                 "valid_doc": False,
                                 "status": "CNPJ_INVALID_FORMAT",
-                                "notes": "Parece que você enviou um CNPJ com caracteres especiais, pontuação ou espaços. Por favor, envie apenas letras e números."
+                                "notes": "Parece que você enviou um CNPJ com símbolos, pontuação ou espaços. Por favor, me envie apenas os dígitos 😊"
                             }
                         },
                         "tipo_invalido": {
@@ -98,7 +95,7 @@ Valida CPF ou CNPJ informado na requisição:
                             "value": {
                                 "valid_doc": False,
                                 "status": "DOCUMENT_INVALID_TYPE",
-                                "notes": "Não foi possível identificar o tipo de documento. Por favor, informe se deseja validar CPF ou CNPJ."
+                                "notes": "Ocorreu um erro na autenticação, por favor envie falar com humano no chat 😊"
                             }
                         }
                     }
@@ -116,7 +113,7 @@ Valida CPF ou CNPJ informado na requisição:
 def validate_document(
     payload: ValidateDocumentInput = Body(
         ...,
-        description="Dados para validação do documento. Informe o tipo do documento e o valor recebido pela aplicação de origem."
+        description="Dados para validação do documento. Informe o tipo do documento e o valor recebido pela aplicação de origem"
     )
 ):
     tipo = str(payload.tipo or "").strip().lower()
@@ -131,7 +128,7 @@ def validate_document(
     else:
         valid = False
         status = "DOCUMENT_INVALID_TYPE"
-        notes = "Não foi possível identificar o tipo de documento. Por favor, informe se deseja validar CPF ou CNPJ."
+        notes = "Ocorreu um erro na autenticação, por favor envie falar com humano no chat 😊"
 
     return {
         "valid_doc": valid,
