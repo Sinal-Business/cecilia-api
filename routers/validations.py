@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Body, Depends
+
 from core.auth import verify
 from schemas.validations import ValidateDocumentInput, ValidateDocumentResponse
 from services.docvalid import validate_cnpj, validate_cpf
@@ -10,82 +11,94 @@ router = APIRouter(
     dependencies=[Depends(verify)]
 )
 
+
 @router.post(
     "/document",
     response_model=ValidateDocumentResponse,
     operation_id="validarDocumento",
     summary="Validar Documento",
     description="""
-Valida CPF ou CNPJ informado na requisição. Regras aplicadas:
-- CPF deve conter apenas números.
-- CPF deve ter exatamente 11 dígitos.
-- CPF não pode conter pontos, traços, letras, espaços ou caracteres especiais.
-- CNPJ deve conter apenas letras e números.
-- CNPJ deve ter exatamente 14 caracteres.
-- CNPJ aceita o novo formato alfanumérico.
-- CNPJ não pode conter pontos, barras, traços, espaços ou caracteres especiais.
-- Os dois últimos caracteres do CNPJ devem ser números.
-- CPF e CNPJ têm os dígitos verificadores validados.
+Valida CPF ou CNPJ informado na requisição:
+- `valid_doc`: booleano indicando se o documento é válido.
+- `status`: status técnico da validação.
+- `notes`: mensagem pronta para retorno ao usuário. Retorna `null` quando o documento é válido.
+
+### Regras aplicadas
+- CPF deve conter apenas números
+- CPF deve ter exatamente 11 dígitos
+- CPF não pode conter pontos, traços, letras, espaços ou caracteres especiais
+- CNPJ deve conter apenas letras e números
+- CNPJ deve ter exatamente 14 caracteres
+- CNPJ aceita formato alfanumérico
+- CNPJ não pode conter pontos, barras, traços, espaços ou caracteres especiais
+- Os dois últimos caracteres do CNPJ devem ser números
+- CPF e CNPJ têm os dígitos verificadores validados
+
+### Status possíveis
+- `CPF_VALID`
+- `CPF_INVALID_EMPTY`
+- `CPF_INVALID_FORMAT`
+- `CPF_INVALID_LENGTH`
+- `CPF_INVALID_DIGITS`
+- `CNPJ_VALID`
+- `CNPJ_INVALID_EMPTY`
+- `CNPJ_INVALID_FORMAT`
+- `CNPJ_INVALID_LENGTH`
+- `CNPJ_INVALID_DIGITS`
+- `DOCUMENT_INVALID_TYPE`
 """,
     responses={
         200: {
-            "description": "Resultado da validação do documento.",
+            "description": "Resultado da validação do documento",
             "content": {
                 "application/json": {
                     "examples": {
                         "cpf_valido": {
                             "summary": "CPF válido",
                             "value": {
-                                "ok": True,
-                                "documento_original": "12345678909",
-                                "documento_valido": True,
-                                "tipo_documento": "CPF",
-                                "status_documento": "VALID_CPF",
-                                "motivo_invalido": ""
+                                "valid_doc": True,
+                                "status": "CPF_VALID",
+                                "notes": None
                             }
                         },
                         "cpf_formato_invalido": {
                             "summary": "CPF com formato inválido",
                             "value": {
-                                "ok": True,
-                                "documento_original": "123.456.789-09",
-                                "documento_valido": False,
-                                "tipo_documento": "CPF",
-                                "status_documento": "INVALID_CPF_FORMAT",
-                                "motivo_invalido": "CPF deve conter apenas números, sem pontos, traços, letras ou espaços"
+                                "valid_doc": False,
+                                "status": "CPF_INVALID_FORMAT",
+                                "notes": "Parece que você enviou um CPF com caracteres especiais, letras ou espaços. Por favor, envie apenas os números do seu CPF."
                             }
                         },
                         "cpf_quantidade_invalida": {
                             "summary": "CPF com quantidade inválida",
                             "value": {
-                                "ok": True,
-                                "documento_original": "123456789",
-                                "documento_valido": False,
-                                "tipo_documento": "CPF",
-                                "status_documento": "INVALID_CPF_LENGTH",
-                                "motivo_invalido": "CPF deve conter exatamente 11 dígitos"
+                                "valid_doc": False,
+                                "status": "CPF_INVALID_LENGTH",
+                                "notes": "O CPF precisa ter exatamente 11 dígitos. Por favor, confira e envie novamente apenas os números."
                             }
                         },
                         "cnpj_valido": {
                             "summary": "CNPJ válido",
                             "value": {
-                                "ok": True,
-                                "documento_original": "12345678000195",
-                                "documento_valido": True,
-                                "tipo_documento": "CNPJ",
-                                "status_documento": "VALID_CNPJ",
-                                "motivo_invalido": ""
+                                "valid_doc": True,
+                                "status": "CNPJ_VALID",
+                                "notes": None
                             }
                         },
                         "cnpj_formato_invalido": {
                             "summary": "CNPJ com formato inválido",
                             "value": {
-                                "ok": True,
-                                "documento_original": "12.345.678/0001-95",
-                                "documento_valido": False,
-                                "tipo_documento": "CNPJ",
-                                "status_documento": "INVALID_CNPJ_FORMAT",
-                                "motivo_invalido": "CNPJ deve conter apenas letras e números, sem pontos, barras, traços ou espaços"
+                                "valid_doc": False,
+                                "status": "CNPJ_INVALID_FORMAT",
+                                "notes": "Parece que você enviou um CNPJ com caracteres especiais, pontuação ou espaços. Por favor, envie apenas letras e números."
+                            }
+                        },
+                        "tipo_invalido": {
+                            "summary": "Tipo de documento inválido",
+                            "value": {
+                                "valid_doc": False,
+                                "status": "DOCUMENT_INVALID_TYPE",
+                                "notes": "Não foi possível identificar o tipo de documento. Por favor, informe se deseja validar CPF ou CNPJ."
                             }
                         }
                     }
@@ -93,42 +106,35 @@ Valida CPF ou CNPJ informado na requisição. Regras aplicadas:
             }
         },
         403: {
-            "description": "Token inválido ou ausente."
+            "description": "Token inválido ou ausente"
         },
         422: {
-            "description": "Payload inválido. Verifique se os campos `tipo` e `valor` foram enviados corretamente."
+            "description": "Payload inválido"
         }
     }
 )
 def validate_document(
     payload: ValidateDocumentInput = Body(
         ...,
-        description="Dados para validação do documento. Informe o tipo do documento e o valor a ser validado."
+        description="Dados para validação do documento. Informe o tipo do documento e o valor recebido pela aplicação de origem."
     )
 ):
     tipo = str(payload.tipo or "").strip().lower()
     valor = str(payload.valor or "").strip()
 
     if tipo == "cpf":
-        valid, status, reason = validate_cpf(valor)
-        tipo_documento = "CPF"
+        valid, status, notes = validate_cpf(valor)
 
     elif tipo == "cnpj":
-        valid, status, reason = validate_cnpj(valor)
-        tipo_documento = "CNPJ"
-        valor = valor.upper()
+        valid, status, notes = validate_cnpj(valor)
 
     else:
         valid = False
-        status = "INVALID_DOCUMENT_TYPE"
-        reason = "Tipo de documento inválido"
-        tipo_documento = ""
+        status = "DOCUMENT_INVALID_TYPE"
+        notes = "Não foi possível identificar o tipo de documento. Por favor, informe se deseja validar CPF ou CNPJ."
 
     return {
-        "ok": True,
-        "documento_original": valor,
-        "documento_valido": valid,
-        "tipo_documento": tipo_documento,
-        "status_documento": status,
-        "motivo_invalido": reason
+        "valid_doc": valid,
+        "status": status,
+        "notes": notes
     }

@@ -7,27 +7,27 @@ from routers.validations import router as validations_router
 tags_metadata = [
     {
         "name": "General",
-        "description": "Endpoints gerais da API."
+        "description": "API for general use"
     },
     {
         "name": "Adm",
-        "description": "Endpoints administrativos."
+        "description": "API for administrations use"
     },
     {
         "name": "Sinal",
-        "description": "Endpoints relacionados à Sinal."
+        "description": "API for Sinal data"
     },
     {
         "name": "Harmonia",
-        "description": "Endpoints relacionados ao Harmonia."
+        "description": "API for Harmonia data"
     },
     {
         "name": "3M",
-        "description": "Endpoints relacionados à 3M."
+        "description": "API for 3M data"
     },
     {
         "name": "Shopping",
-        "description": "Endpoints relacionados a Shopping."
+        "description": "API for Shopping data"
     }
 ]
 

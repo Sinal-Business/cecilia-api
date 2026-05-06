@@ -5,16 +5,32 @@ def validate_cpf(value: str):
     cpf = str(value or "").strip()
 
     if not cpf:
-        return False, "INVALID_CPF_EMPTY", "CPF vazio"
+        return (
+            False,
+            "CPF_INVALID_EMPTY",
+            "Não identifiquei o CPF informado. Por favor, envie apenas os números do seu CPF."
+        )
 
     if not re.fullmatch(r"\d+", cpf):
-        return False, "INVALID_CPF_FORMAT", "CPF deve conter apenas números, sem pontos, traços, letras ou espaços"
+        return (
+            False,
+            "CPF_INVALID_FORMAT",
+            "Parece que você enviou um CPF com caracteres especiais, letras ou espaços. Por favor, envie apenas os números do seu CPF."
+        )
 
     if len(cpf) != 11:
-        return False, "INVALID_CPF_LENGTH", "CPF deve conter exatamente 11 dígitos"
+        return (
+            False,
+            "CPF_INVALID_LENGTH",
+            "O CPF precisa ter exatamente 11 dígitos. Por favor, confira e envie novamente apenas os números."
+        )
 
     if cpf == cpf[0] * 11:
-        return False, "INVALID_CPF_DIGITS", "CPF inválido"
+        return (
+            False,
+            "CPF_INVALID_DIGITS",
+            "O CPF informado não parece ser válido. Por favor, confira os números e envie novamente."
+        )
 
     def calc_digit(base, factor):
         total = sum(
@@ -30,27 +46,54 @@ def validate_cpf(value: str):
     second_digit = calc_digit(cpf[:10], 11)
 
     if first_digit != int(cpf[9]) or second_digit != int(cpf[10]):
-        return False, "INVALID_CPF_DIGITS", "Dígitos verificadores do CPF inválidos"
+        return (
+            False,
+            "CPF_INVALID_DIGITS",
+            "O CPF informado não parece ser válido. Por favor, confira os números e envie novamente."
+        )
 
-    return True, "VALID_CPF", ""
+    return True, "CPF_VALID", None
+
 
 def validate_cnpj(value: str):
-    cnpj = str(value or "").strip().upper()
+    cnpj = str(value or "").strip()
 
     if not cnpj:
-        return False, "INVALID_CNPJ_EMPTY", "CNPJ vazio"
+        return (
+            False,
+            "CNPJ_INVALID_EMPTY",
+            "Não identifiquei o CNPJ informado. Por favor, envie o CNPJ novamente."
+        )
 
-    if not re.fullmatch(r"[A-Z0-9]+", cnpj):
-        return False, "INVALID_CNPJ_FORMAT", "CNPJ deve conter apenas letras e números, sem pontos, barras, traços ou espaços"
+    if not re.fullmatch(r"[A-Za-z0-9]+", cnpj):
+        return (
+            False,
+            "CNPJ_INVALID_FORMAT",
+            "Parece que você enviou um CNPJ com caracteres especiais, pontuação ou espaços. Por favor, envie apenas letras e números."
+        )
 
     if len(cnpj) != 14:
-        return False, "INVALID_CNPJ_LENGTH", "CNPJ deve conter exatamente 14 caracteres"
+        return (
+            False,
+            "CNPJ_INVALID_LENGTH",
+            "O CNPJ precisa ter exatamente 14 caracteres. Por favor, confira e envie novamente."
+        )
 
     if not re.fullmatch(r"\d{2}", cnpj[-2:]):
-        return False, "INVALID_CNPJ_FORMAT", "Os dois últimos caracteres do CNPJ devem ser números"
+        return (
+            False,
+            "CNPJ_INVALID_FORMAT",
+            "Os dois últimos caracteres do CNPJ precisam ser números. Por favor, confira e envie novamente."
+        )
 
-    if cnpj == cnpj[0] * 14:
-        return False, "INVALID_CNPJ_DIGITS", "CNPJ inválido"
+    cnpj_calc = cnpj.upper()
+
+    if cnpj_calc == cnpj_calc[0] * 14:
+        return (
+            False,
+            "CNPJ_INVALID_DIGITS",
+            "O CNPJ informado não parece ser válido. Por favor, confira os caracteres e envie novamente."
+        )
 
     def char_value(char):
         return ord(char) - 48
@@ -68,10 +111,14 @@ def validate_cnpj(value: str):
     first_weights = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
     second_weights = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
 
-    first_digit = calc_digit(cnpj[:12], first_weights)
-    second_digit = calc_digit(cnpj[:12] + str(first_digit), second_weights)
+    first_digit = calc_digit(cnpj_calc[:12], first_weights)
+    second_digit = calc_digit(cnpj_calc[:12] + str(first_digit), second_weights)
 
-    if first_digit != int(cnpj[12]) or second_digit != int(cnpj[13]):
-        return False, "INVALID_CNPJ_DIGITS", "Dígitos verificadores do CNPJ inválidos"
+    if first_digit != int(cnpj_calc[12]) or second_digit != int(cnpj_calc[13]):
+        return (
+            False,
+            "CNPJ_INVALID_DIGITS",
+            "O CNPJ informado não parece ser válido. Por favor, confira os caracteres e envie novamente."
+        )
 
-    return True, "VALID_CNPJ", ""
+    return True, "CNPJ_VALID", None

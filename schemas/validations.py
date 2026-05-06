@@ -1,5 +1,4 @@
-from typing import Literal
-
+from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 
@@ -12,38 +11,22 @@ class ValidateDocumentInput(BaseModel):
 
     valor: str = Field(
         ...,
-        description="Documento a ser validado. Para CPF, envie apenas números. Para CNPJ, envie apenas letras e números, sem pontos, barras, traços ou espaços.",
+        description="Documento a ser validado exatamente como foi recebido pela aplicação de origem.",
         examples=["12345678909"]
     )
 
-
 class ValidateDocumentResponse(BaseModel):
-    ok: bool = Field(
-        ...,
-        description="Indica se a requisição foi processada pela API."
-    )
-
-    documento_original: str = Field(
-        ...,
-        description="Documento recebido pela API após tratamento básico de espaços. Para CNPJ, o valor é retornado em letras maiúsculas."
-    )
-
-    documento_valido: bool = Field(
+    valid_doc: bool = Field(
         ...,
         description="Indica se o documento informado é válido."
     )
 
-    tipo_documento: str = Field(
+    status: str = Field(
         ...,
-        description="Tipo de documento validado: CPF ou CNPJ."
+        description="Status técnico da validação do documento."
     )
 
-    status_documento: str = Field(
-        ...,
-        description="Status técnico da validação. Use este campo para identificar o resultado da análise."
-    )
-
-    motivo_invalido: str = Field(
-        ...,
-        description="Motivo pelo qual o documento foi considerado inválido. Retorna vazio quando o documento é válido."
+    notes: Optional[str] = Field(
+        None,
+        description="Mensagem pronta para retorno ao usuário. Retorna null quando o documento é válido."
     )
