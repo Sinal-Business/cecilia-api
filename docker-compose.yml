@@ -1,0 +1,15 @@
+services:
+  cecilia-api:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: cecilia-api
+    ports:
+      - "8000:8000"
+    environment:
+      TOKEN: ${TOKEN}
+      SQL_SERVER_HOST: ${SQL_SERVER_HOST}
+      SQL_SERVER_DB: ${SQL_SERVER_DB}
+      SQL_SERVER_USER: ${SQL_SERVER_USER}
+      SQL_SERVER_PASSWORD: ${SQL_SERVER_PASSWORD}
+    command: uvicorn main:app --host 0.0.0.0 --port 8000

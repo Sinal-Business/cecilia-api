@@ -1,0 +1,128 @@
+openapi: 3.1.0
+info:
+  title: Cecilia API
+  version: "2.0.0"
+
+servers:
+  - url: https://chat-gdatabot.onrender.com
+
+security:
+  - BearerAuth: []
+
+paths:
+  /validations/document:
+    post:
+      operationId: validateDocument
+      tags:
+        - Validações
+      summary: Valida CPF ou CNPJ
+      description: Valida documentos CPF e CNPJ, incluindo formato, quantidade de caracteres e dígitos verificadores.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidateDocumentRequest"
+            examples:
+              cpf:
+                summary: Validação de CPF
+                value:
+                  tipo: cpf
+                  valor: "12345678909"
+              cnpj:
+                summary: Validação de CNPJ
+                value:
+                  tipo: cnpj
+                  valor: "12345678000195"
+      responses:
+        "200":
+          description: Resultado da validação do documento
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidateDocumentResponse"
+              examples:
+                validCpf:
+                  summary: CPF válido
+                  value:
+                    ok: true
+                    documento_original: "12345678909"
+                    documento_valido: true
+                    tipo_documento: CPF
+                    status_documento: VALID_CPF
+                    motivo_invalido: ""
+                invalidCpf:
+                  summary: CPF inválido
+                  value:
+                    ok: true
+                    documento_original: "123.456.789-09"
+                    documento_valido: false
+                    tipo_documento: CPF
+                    status_documento: INVALID_CPF_FORMAT
+                    motivo_invalido: CPF deve conter apenas números, sem pontos, traços, letras ou espaços
+        "403":
+          description: Token inválido
+        "422":
+          description: Erro de validação do payload
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ValidateDocumentRequest:
+      type: object
+      required:
+        - tipo
+        - valor
+      properties:
+        tipo:
+          type: string
+          description: Tipo do documento a validar.
+          enum:
+            - cpf
+            - cnpj
+          example: cpf
+        valor:
+          type: string
+          description: Valor do documento sem pontuação.
+          example: "12345678909"
+
+    ValidateDocumentResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: true
+        documento_original:
+          type: string
+          example: "12345678909"
+        documento_valido:
+          type: boolean
+          example: true
+        tipo_documento:
+          type: string
+          example: CPF
+        status_documento:
+          type: string
+          example: VALID_CPF
+          enum:
+            - VALID_CPF
+            - INVALID_CPF_EMPTY
+            - INVALID_CPF_FORMAT
+            - INVALID_CPF_LENGTH
+            - INVALID_CPF_DIGITS
+            - VALID_CNPJ
+            - INVALID_CNPJ_EMPTY
+            - INVALID_CNPJ_FORMAT
+            - INVALID_CNPJ_LENGTH
+            - INVALID_CNPJ_DIGITS
+            - INVALID_DOCUMENT_TYPE
+        motivo_invalido:
+          type: string
+          example: ""
