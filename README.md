@@ -1,6 +1,6 @@
 # CECILia API <img src="https://snipboard.io/rlh6gz.jpg" width="10%" align="right" valign="middle" alt="CECILia logo"/>
 
-API de servicos da Sinal Business para disponibilizar validacoes e integracoes de forma centralizada, segura e reutilizavel.
+Service API from Sinal Business
 
 <div align="center">
 
