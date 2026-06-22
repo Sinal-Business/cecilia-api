@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_redoc_html
+from routers.adm import router as adm_router
 from routers.health import router as health_router
 from routers.validations import router as validations_router
 
@@ -63,3 +64,4 @@ def custom_redoc():
 
 app.include_router(health_router)
 app.include_router(validations_router)
+app.include_router(adm_router)

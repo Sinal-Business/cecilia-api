@@ -67,6 +67,63 @@ paths:
         "422":
           description: Erro de validação do payload
 
+  /adm/client-charge:
+    patch:
+      operationId: atualizarCobrancaCliente
+      tags:
+        - Adm
+      summary: Atualizar Cobrança de Cliente
+      description: |
+        Atualiza os campos de cobrança gerenciados pelo webhook BotConversa em
+        dbo.sinal_financeiro_hiscobranca, localizando os registros por contato.
+
+        Somente os campos abaixo podem ser alterados por este endpoint:
+        - status
+        - dt_cobranca
+        - resposta
+        - dt_projecao_pgto
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateClientChargeRequest"
+            examples:
+              botconversa:
+                summary: Atualização enviada pelo BotConversa
+                value:
+                  contato: "5521999999999"
+                  status: Atual (Com Projeção)
+                  dt_cobranca: "2026-06-22"
+                  resposta: Cliente informou previsão de pagamento.
+                  dt_projecao_pgto: "2026-06-30"
+      responses:
+        "200":
+          description: Cobrança atualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateClientChargeResponse"
+              examples:
+                updated:
+                  summary: Atualização realizada
+                  value:
+                    ok: true
+                    updated_count: 1
+                    contato: "5521999999999"
+        "400":
+          description: Nenhum campo de cobrança informado
+        "403":
+          description: Token inválido ou ausente
+        "404":
+          description: Nenhuma cobrança encontrada para o filtro informado
+        "422":
+          description: Erro de validação do payload
+        "503":
+          description: Falha ao atualizar a cobrança
+
 components:
   securitySchemes:
     BearerAuth:
@@ -126,3 +183,62 @@ components:
         motivo_invalido:
           type: string
           example: ""
+
+    UpdateClientChargeRequest:
+      type: object
+      required:
+        - contato
+        - status
+        - dt_cobranca
+      properties:
+        contato:
+          type: string
+          minLength: 1
+          maxLength: 40
+          description: Valor usado para localizar a cobrança na coluna contato.
+          example: "5521999999999"
+        status:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Novo status da cobrança.
+          example: Atual (Com Projeção)
+        dt_cobranca:
+          type: string
+          format: date
+          description: Data da cobrança no formato YYYY-MM-DD.
+          example: "2026-06-22"
+        resposta:
+          anyOf:
+            - type: string
+              maxLength: 2000
+            - type: "null"
+          description: Resposta ou observação retornada pelo cliente.
+          example: Cliente informou previsão de pagamento.
+        dt_projecao_pgto:
+          anyOf:
+            - type: string
+              format: date
+            - type: "null"
+          description: Data projetada de pagamento no formato YYYY-MM-DD.
+          example: "2026-06-30"
+
+    UpdateClientChargeResponse:
+      type: object
+      required:
+        - ok
+        - updated_count
+        - contato
+      properties:
+        ok:
+          type: boolean
+          description: Indica se a atualização foi processada.
+          example: true
+        updated_count:
+          type: integer
+          description: Quantidade de cobranças atualizadas.
+          example: 1
+        contato:
+          type: string
+          description: Contato usado no filtro.
+          example: "5521999999999"

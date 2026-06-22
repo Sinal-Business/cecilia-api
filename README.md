@@ -28,6 +28,7 @@ Service API from Sinal Business
   - [📡 Endpoints](#-endpoints)
     - [Service status](#service-status)
     - [Validate CPF or CNPJ](#validate-cpf-or-cnpj)
+    - [Atualizar Cobrança de Cliente](#atualizar-cobrança-de-cliente)
   - [🐳 Docker](#-docker)
   - [⚙️ Environment Variables](#️-environment-variables)
   - [📁 Project Structure](#-project-structure)
@@ -45,7 +46,8 @@ The CECILia API is a FastAPI service used by the CECILia ecosystem. Version `2.0
 - Numeric and alphanumeric CNPJ validation, including check digits.
 - Bearer token authentication for protected routes.
 - ReDoc and OpenAPI documentation.
-- SQL Server connection support for future data-backed services.
+- SQL Server connection support for data-backed services.
+- Adm endpoint for BotConversa collection webhook updates.
 - Containerized execution with Docker and Docker Compose.
 
 ## 🧰 Technology
@@ -72,6 +74,7 @@ FastAPI
   +-- Routers
   |     +-- Health and documentation
   |     +-- Document validation
+  |     +-- Adm collection webhook updates
   |
   +-- Services
   |     +-- CPF and CNPJ validation rules
@@ -202,6 +205,41 @@ Possible status values:
 | CNPJ | `CNPJ_INVALID_LENGTH` |
 | CNPJ | `CNPJ_INVALID_DIGITS` |
 | General | `DOCUMENT_INVALID_TYPE` |
+
+### Atualizar Cobrança de Cliente
+
+```http
+PATCH /adm/client-charge
+Authorization: Bearer <TOKEN>
+Content-Type: application/json
+```
+
+Request:
+
+```json
+{
+  "contato": "5521999999999",
+  "status": "Atual (Com Projeção)",
+  "dt_cobranca": "2026-06-22",
+  "resposta": "Cliente informou previsão de pagamento.",
+  "dt_projecao_pgto": "2026-06-30"
+}
+```
+
+The endpoint filters `dbo.sinal_financeiro_hiscobranca` by `contato`, updates
+all matching invoices, and only changes `status`, `dt_cobranca`, `resposta`,
+and `dt_projecao_pgto`. `status` and `dt_cobranca` are required; `resposta`
+and `dt_projecao_pgto` are optional.
+
+Response:
+
+```json
+{
+  "ok": true,
+  "updated_count": 1,
+  "contato": "5521999999999"
+}
+```
 
 ## 🐳 Docker
 
