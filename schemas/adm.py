@@ -19,11 +19,6 @@ class UpdateClientChargeInput(BaseModel):
         min_length=1,
         max_length=255,
     )
-    dt_cobranca: date = Field(
-        ...,
-        description="Data da cobrança no formato YYYY-MM-DD",
-        examples=["2026-06-22"],
-    )
     resposta: Optional[str] = Field(
         None,
         description="Resposta ou observação retornada pelo cliente",

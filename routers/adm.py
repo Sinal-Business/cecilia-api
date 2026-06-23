@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 TABLE = "dbo.sinal_financeiro_hiscobranca"
 FIELD_MAP = {
     "status": "status",
-    "dt_cobranca": "dt_cobranca",
     "resposta": "resposta",
     "dt_projecao_pgto": "dt_projecao_pgto",
 }
@@ -31,14 +30,16 @@ FIELD_MAP = {
     operation_id="atualizarCobrancaCliente",
     summary="Atualizar Cobrança de Cliente",
     description="""
-Atualiza os campos de cobrança gerenciados pelo webhook BotConversa em
+Atualiza os campos de cobrança gerenciados via webhook em
 `dbo.sinal_financeiro_hiscobranca`, localizando os registros por `contato`.
 
 Somente os campos abaixo podem ser alterados por este endpoint:
 - `status`
-- `dt_cobranca`
 - `resposta`
 - `dt_projecao_pgto`
+
+`dt_cobranca` é preenchida automaticamente pelo backend com a data e hora
+atual sempre que a atualização é processada.
 """,
     responses={
         200: {"description": "Cobrança atualizada"},
@@ -52,14 +53,19 @@ Somente os campos abaixo podem ser alterados por este endpoint:
 def update_client_charge(
     payload: UpdateClientChargeInput = Body(
         ...,
-        description="Dados recebidos do BotConversa para atualizar a cobrança do cliente",
+        description="Dados recebidos via webhook para atualizar a cobrança do cliente",
     )
 ):
     values = payload.dict(exclude_unset=True)
     contato = values.pop("contato").strip()
     changes = {key: value for key, value in values.items() if key in FIELD_MAP}
 
-    assignments = ", ".join(f"{FIELD_MAP[key]} = ?" for key in changes)
+    assignments = ", ".join(
+        [
+            "dt_cobranca = CONVERT(datetime2(0), SYSDATETIMEOFFSET() AT TIME ZONE 'E. South America Standard Time')"
+        ]
+        + [f"{FIELD_MAP[key]} = ?" for key in changes]
+    )
 
     try:
         with get_sqlserver_connection() as conn:

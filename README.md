@@ -220,7 +220,6 @@ Request:
 {
   "contato": "5521999999999",
   "status": "Atual (Com Projeção)",
-  "dt_cobranca": "2026-06-22",
   "resposta": "Cliente informou previsão de pagamento.",
   "dt_projecao_pgto": "2026-06-30"
 }
