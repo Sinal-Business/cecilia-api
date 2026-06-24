@@ -264,16 +264,18 @@ docker compose down
 | Variable | Required | Description |
 | --- | --- | --- |
 | `TOKEN` | Yes | Bearer token accepted by protected endpoints |
-| `SQL_SERVER_HOST` | For database access | SQL Server hostname |
-| `SQL_SERVER_DB` | For database access | Database name |
-| `SQL_SERVER_USER` | For database access | Database user |
-| `SQL_SERVER_PASSWORD` | For database access | Database password |
+| `DATABASE_URL` | For database access | Full SQL Server ODBC connection string; preferred for Render |
+| `SQL_SERVER_HOST` | Fallback database access | SQL Server hostname when `DATABASE_URL` is not set |
+| `SQL_SERVER_DB` | Fallback database access | Database name when `DATABASE_URL` is not set |
+| `SQL_SERVER_USER` | Fallback database access | Database user when `DATABASE_URL` is not set |
+| `SQL_SERVER_PASSWORD` | Fallback database access | Database password when `DATABASE_URL` is not set |
 | `PORT` | No | HTTP port used by the container; defaults to `8000` |
 
 Example with placeholders only:
 
 ```dotenv
 TOKEN=replace-with-a-strong-random-token
+DATABASE_URL=Driver={ODBC Driver 18 for SQL Server};Server=tcp:your-server.database.windows.net,1433;Database=your-database;Uid=your-user;Pwd=your-password;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;
 SQL_SERVER_HOST=your-server
 SQL_SERVER_DB=your-database
 SQL_SERVER_USER=your-user

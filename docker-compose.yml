@@ -8,6 +8,7 @@ services:
       - "8000:8000"
     environment:
       TOKEN: ${TOKEN}
+      DATABASE_URL: ${DATABASE_URL}
       SQL_SERVER_HOST: ${SQL_SERVER_HOST}
       SQL_SERVER_DB: ${SQL_SERVER_DB}
       SQL_SERVER_USER: ${SQL_SERVER_USER}
