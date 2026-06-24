@@ -1,4 +1,5 @@
 import logging
+import re
 import secrets
 
 from fastapi import APIRouter, Body, Depends, HTTPException
@@ -24,6 +25,16 @@ FIELD_MAP = {
 }
 
 
+def normalize_contact(value: str) -> str:
+    contact = re.sub(r"\D", "", value or "")
+    if not contact:
+        raise HTTPException(
+            status_code=422,
+            detail="Contato deve conter ao menos um numero",
+        )
+    return contact
+
+
 @router.patch(
     "/client-charge",
     response_model=UpdateClientChargeResponse,
@@ -32,6 +43,8 @@ FIELD_MAP = {
     description="""
 Atualiza os campos de cobrança gerenciados via webhook em
 `dbo.sinal_financeiro_hiscobranca`, localizando os registros por `contato`.
+O `contato` pode vir com `+`, espaços, hífens ou parênteses; o backend
+normaliza o valor para somente números antes da busca.
 
 Somente os campos abaixo podem ser alterados por este endpoint:
 - `status`
@@ -57,7 +70,7 @@ def update_client_charge(
     )
 ):
     values = payload.dict(exclude_unset=True)
-    contato = values.pop("contato").strip()
+    contato = normalize_contact(values.pop("contato"))
     changes = {key: value for key, value in values.items() if key in FIELD_MAP}
 
     assignments = ", ".join(

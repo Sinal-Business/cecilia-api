@@ -218,7 +218,7 @@ Request:
 
 ```json
 {
-  "contato": "5521999999999",
+  "contato": "+5521999999999",
   "status": "Atual (Com Projeção)",
   "resposta": "Cliente informou previsão de pagamento.",
   "dt_projecao_pgto": "2026-06-30"
@@ -226,9 +226,12 @@ Request:
 ```
 
 The endpoint filters `dbo.sinal_financeiro_hiscobranca` by `contato`, updates
-all matching invoices, and only changes `status`, `dt_cobranca`, `resposta`,
-and `dt_projecao_pgto`. `status` and `dt_cobranca` are required; `resposta`
-and `dt_projecao_pgto` are optional.
+all matching invoices, and only changes `status`, `resposta`, and
+`dt_projecao_pgto`. `status` is required; `resposta` and `dt_projecao_pgto`
+are optional. The received `contato` may include `+`, spaces, hyphens, or
+parentheses; the API normalizes it to digits before matching the database.
+`dt_cobranca` is filled automatically by the backend with the current
+São Paulo date and time whenever the update is processed.
 
 Response:
 

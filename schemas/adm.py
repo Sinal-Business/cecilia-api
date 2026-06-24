@@ -7,8 +7,8 @@ from pydantic import BaseModel, Field
 class UpdateClientChargeInput(BaseModel):
     contato: str = Field(
         ...,
-        description="Valor usado para localizar a cobrança na coluna contato",
-        examples=["5521999999999"],
+        description="Valor usado para localizar a cobrança; aceita + e pontuação, mas será normalizado para números",
+        examples=["+5521999999999"],
         min_length=1,
         max_length=40,
     )

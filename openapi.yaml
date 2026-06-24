@@ -76,12 +76,15 @@ paths:
       description: |
         Atualiza os campos de cobrança gerenciados pelo webhook BotConversa em
         dbo.sinal_financeiro_hiscobranca, localizando os registros por contato.
+        O contato pode vir com +, espaços, hífens ou parênteses; o backend
+        normaliza o valor para somente números antes da busca.
 
         Somente os campos abaixo podem ser alterados por este endpoint:
         - status
-        - dt_cobranca
         - resposta
         - dt_projecao_pgto
+        dt_cobranca é preenchida automaticamente pelo backend com a data e hora
+        atual de São Paulo sempre que a atualização é processada.
       security:
         - BearerAuth: []
       requestBody:
@@ -94,9 +97,8 @@ paths:
               botconversa:
                 summary: Atualização enviada pelo BotConversa
                 value:
-                  contato: "5521999999999"
+                  contato: "+5521999999999"
                   status: Atual (Com Projeção)
-                  dt_cobranca: "2026-06-22"
                   resposta: Cliente informou previsão de pagamento.
                   dt_projecao_pgto: "2026-06-30"
       responses:
@@ -189,25 +191,19 @@ components:
       required:
         - contato
         - status
-        - dt_cobranca
       properties:
         contato:
           type: string
           minLength: 1
           maxLength: 40
-          description: Valor usado para localizar a cobrança na coluna contato.
-          example: "5521999999999"
+          description: Valor usado para localizar a cobrança; aceita + e pontuação, mas será normalizado para números.
+          example: "+5521999999999"
         status:
           type: string
           minLength: 1
           maxLength: 255
           description: Novo status da cobrança.
           example: Atual (Com Projeção)
-        dt_cobranca:
-          type: string
-          format: date
-          description: Data da cobrança no formato YYYY-MM-DD.
-          example: "2026-06-22"
         resposta:
           anyOf:
             - type: string
