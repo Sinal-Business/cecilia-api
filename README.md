@@ -31,6 +31,7 @@ Service API from Sinal Business
     - [Atualizar Cobrança de Cliente](#atualizar-cobrança-de-cliente)
   - [🐳 Docker](#-docker)
   - [⚙️ Environment Variables](#️-environment-variables)
+  - [Render Deployment](#render-deployment)
   - [📁 Project Structure](#-project-structure)
   - [🛡️ Security](#️-security)
 
@@ -281,6 +282,27 @@ SQL_SERVER_DB=your-database
 SQL_SERVER_USER=your-user
 SQL_SERVER_PASSWORD=your-password
 PORT=8000
+```
+
+## Render Deployment
+
+Deploy this service as a Docker Web Service, not as the native Python runtime.
+The Docker image installs Microsoft's SQL Server ODBC driver, which is required
+by `pyodbc` when `DATABASE_URL` uses `Driver={ODBC Driver 18 for SQL Server}`.
+
+Recommended Render settings:
+
+| Setting | Value |
+| --- | --- |
+| Runtime | Docker |
+| Dockerfile Path | `./dockerfile` |
+| Environment variables | `TOKEN`, `DATABASE_URL` |
+
+If the service is deployed as Python instead of Docker, SQL Server routes can
+fail with:
+
+```text
+Can't open lib 'ODBC Driver 18 for SQL Server' : file not found
 ```
 
 ## 📁 Project Structure

@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: cecilia-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./dockerfile
+    region: oregon
+    envVars:
+      - key: TOKEN
+        sync: false
+      - key: DATABASE_URL
+        sync: false
