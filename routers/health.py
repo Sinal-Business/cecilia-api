@@ -25,7 +25,19 @@ def serve_ai_plugin():
     return FileResponse(".well-known/ai-plugin.json")
 
 
-@router.get("/health/db", tags=["General"], dependencies=[Depends(verify)])
+@router.get(
+    "/health/db",
+    tags=["Health"],
+    dependencies=[Depends(verify)],
+    operation_id="checarBancoDados",
+    summary="Checar Banco de Dados",
+    description="Verifica se a API consegue abrir conexão com o banco SQL Server.",
+    responses={
+        200: {"description": "Conexão com o banco validada"},
+        403: {"description": "Token inválido ou ausente"},
+        503: {"description": "Falha ao conectar no banco de dados"},
+    },
+)
 def check_database():
     try:
         with get_sqlserver_connection() as conn:
@@ -39,7 +51,7 @@ def check_database():
             status_code=503,
             content={
                 "ok": False,
-                "detail": "Database connection failed",
+                "detail": "Não foi possível conectar ao banco de dados",
                 "reference": reference,
             },
             headers={"X-Request-Reference": reference},

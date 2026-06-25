@@ -29,6 +29,10 @@ tags_metadata = [
     {
         "name": "Shopping",
         "description": "API for Shopping data"
+    },
+    {
+        "name": "Health",
+        "description": "API health checks and infrastructure diagnostics"
     }
 ]
 
