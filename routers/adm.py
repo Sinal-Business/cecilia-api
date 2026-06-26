@@ -12,7 +12,6 @@ from schemas.adm import UpdateClientChargeInput, UpdateClientChargeResponse
 
 router = APIRouter(
     prefix="/adm",
-    tags=["Adm"],
     dependencies=[Depends(verify)],
 )
 logger = logging.getLogger(__name__)
@@ -61,11 +60,12 @@ def not_found_response(error_code: str, detail: str, contato: str):
     "/client-charge",
     response_model=UpdateClientChargeResponse,
     operation_id="atualizarCobrancaCliente",
+    tags=["Sinal"],
     summary="Atualizar Cobrança de Cliente",
     description="""
-Atualiza os campos de cobrança gerenciados via webhook em
-`dbo.sinal_financeiro_hiscobranca`, localizando os registros por `contato`.
-O `contato` pode vir com `+`, espaços, hífens ou parênteses; o backend
+Atualiza os campos de cobrança exibidos no módulo Kanban do Financeiro,
+localizando os registros por `contato`.
+O `contato` pode vir com `+`, espaços, hífens ou parênteses; a aplicação
 normaliza o valor para somente números antes da busca.
 
 Somente os campos abaixo podem ser alterados por este endpoint:
@@ -73,7 +73,7 @@ Somente os campos abaixo podem ser alterados por este endpoint:
 - `resposta`
 - `dt_projecao_pgto`
 
-`dt_cobranca` é preenchida automaticamente pelo backend com a data e hora
+`dt_cobranca` é preenchida automaticamente pela aplicação com a data e hora
 atual sempre que a atualização é processada.
 """,
     responses={

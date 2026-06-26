@@ -71,19 +71,19 @@ paths:
     patch:
       operationId: atualizarCobrancaCliente
       tags:
-        - Adm
+        - Sinal
       summary: Atualizar Cobrança de Cliente
       description: |
-        Atualiza os campos de cobrança gerenciados pelo webhook BotConversa em
-        dbo.sinal_financeiro_hiscobranca, localizando os registros por contato.
-        O contato pode vir com +, espaços, hífens ou parênteses; o backend
+        Atualiza os campos de cobrança exibidos no módulo Kanban do Financeiro,
+        localizando os registros por contato.
+        O contato pode vir com +, espaços, hífens ou parênteses; a aplicação
         normaliza o valor para somente números antes da busca.
 
         Somente os campos abaixo podem ser alterados por este endpoint:
         - status
         - resposta
         - dt_projecao_pgto
-        dt_cobranca é preenchida automaticamente pelo backend com a data e hora
+        dt_cobranca é preenchida automaticamente pela aplicação com a data e hora
         atual de São Paulo sempre que a atualização é processada.
       security:
         - BearerAuth: []
@@ -125,6 +125,300 @@ paths:
           description: Erro de validação do payload
         "503":
           description: Falha ao atualizar a cobrança
+
+  /chatbots/registrarAtendimento:
+    post:
+      operationId: registrarAtendimento
+      tags:
+        - Chatbots
+      summary: Registrar Atendimento
+      description: Registra um atendimento iniciado pela aplicação de chatbot.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatbotEventRequest"
+            examples:
+              atendimento:
+                summary: Atendimento iniciado
+                value:
+                  id_cliente: "12345"
+                  tags: NomeCadastrado
+                  dt_interacao: "2026-06-26T14:30:00"
+                  bot: CECILia
+      responses:
+        "200":
+          description: Registro criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatbotRecordResponse"
+        "400":
+          description: Payload vazio
+        "403":
+          description: Token inválido ou ausente
+        "422":
+          description: Payload inválido
+        "503":
+          description: Falha ao registrar o evento
+
+  /chatbots/registrarContatoInicial:
+    post:
+      operationId: registrarContatoInicial
+      tags:
+        - Chatbots
+      summary: Registrar Contato Inicial
+      description: Registra o primeiro contato do cliente na jornada do chatbot.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatbotEventRequest"
+            examples:
+              contatoInicial:
+                summary: Contato inicial
+                value:
+                  id_cliente: "12345"
+                  motivo: Financeiro
+                  menu: Segunda via
+                  dt_interacao: "2026-06-26T14:31:00"
+                  bot: CECILia
+      responses:
+        "200":
+          description: Registro criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatbotRecordResponse"
+        "400":
+          description: Payload vazio
+        "403":
+          description: Token inválido ou ausente
+        "422":
+          description: Payload inválido
+        "503":
+          description: Falha ao registrar o evento
+
+  /chatbots/registrarInteracao:
+    post:
+      operationId: registrarInteracao
+      tags:
+        - Chatbots
+      summary: Registrar Interação
+      description: Registra uma interação ocorrida durante o atendimento no chatbot.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatbotEventRequest"
+            examples:
+              interacao:
+                summary: Interação registrada
+                value:
+                  id_cliente: 12345
+                  id_interacao: 1
+                  resumo: Cliente solicitou segunda via do boleto.
+                  dt_interacao: "2026-06-26T14:32:00"
+                  bot: CECILia
+      responses:
+        "200":
+          description: Registro criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatbotRecordResponse"
+        "400":
+          description: Payload vazio
+        "403":
+          description: Token inválido ou ausente
+        "422":
+          description: Payload inválido
+        "503":
+          description: Falha ao registrar o evento
+
+  /chatbots/registrarAvaliacaoAtendimento:
+    post:
+      operationId: registrarAvaliacaoAtendimento
+      tags:
+        - Chatbots
+      summary: Registrar Avaliação de Atendimento
+      description: Registra a avaliação enviada pelo cliente ao final do atendimento.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatbotEventRequest"
+            examples:
+              avaliacao:
+                summary: Avaliação registrada
+                value:
+                  id_cliente: 12345
+                  nota: "5"
+                  comentario: Atendimento rápido.
+                  dt_interacao: "2026-06-26T14:40:00"
+                  bot: CECILia
+      responses:
+        "200":
+          description: Registro criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatbotRecordResponse"
+        "400":
+          description: Payload vazio
+        "403":
+          description: Token inválido ou ausente
+        "422":
+          description: Payload inválido
+        "503":
+          description: Falha ao registrar o evento
+
+  /chatbots/registrarAtendimentoHumano:
+    post:
+      operationId: registrarAtendimentoHumano
+      tags:
+        - Chatbots
+      summary: Registrar Atendimento Humano
+      description: Registra o encaminhamento ou atendimento realizado por uma pessoa.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatbotEventRequest"
+            examples:
+              atendimentoHumano:
+                summary: Atendimento humano
+                value:
+                  id_cliente: 12345
+                  pr_resumo: Cliente pediu suporte humano.
+                  tp_atendimento: Financeiro
+                  dt_interacao: "2026-06-26T14:35:00"
+                  bot: CECILia
+      responses:
+        "200":
+          description: Registro criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatbotRecordResponse"
+        "400":
+          description: Payload vazio
+        "403":
+          description: Token inválido ou ausente
+        "422":
+          description: Payload inválido
+        "503":
+          description: Falha ao registrar o evento
+
+  /chatbots/registrarContatoFinal:
+    post:
+      operationId: registrarContatoFinal
+      tags:
+        - Chatbots
+      summary: Registrar Contato Final
+      description: Registra o encerramento do contato e se a demanda foi resolvida.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatbotEventRequest"
+            examples:
+              contatoFinal:
+                summary: Contato final
+                value:
+                  id_cliente: 12345
+                  pr_resolvidosn: S
+                  dt_interacao: "2026-06-26T14:45:00"
+                  bot: CECILia
+      responses:
+        "200":
+          description: Registro criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatbotRecordResponse"
+        "400":
+          description: Payload vazio
+        "403":
+          description: Token inválido ou ausente
+        "422":
+          description: Payload inválido
+        "503":
+          description: Falha ao registrar o evento
+
+  /chatbots/registrarServico:
+    post:
+      operationId: registrarServico
+      tags:
+        - Chatbots
+      summary: Registrar Serviço
+      description: Registra o serviço solicitado ou executado durante o atendimento.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatbotEventRequest"
+            examples:
+              servico:
+                summary: Serviço registrado
+                value:
+                  id_cliente: 12345
+                  servico: Segunda via de boleto
+                  dt_interacao: "2026-06-26T14:33:00"
+                  bot: CECILia
+      responses:
+        "200":
+          description: Registro criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatbotRecordResponse"
+        "400":
+          description: Payload vazio
+        "403":
+          description: Token inválido ou ausente
+        "422":
+          description: Payload inválido
+        "503":
+          description: Falha ao registrar o evento
+
+  /health/db:
+    get:
+      operationId: checarBancoDados
+      tags:
+        - Health
+      summary: Checar Banco de Dados
+      description: Verifica se a API consegue abrir conexão com o banco SQL Server.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Conexão com o banco validada
+        "403":
+          description: Token inválido ou ausente
+        "503":
+          description: Falha ao conectar no banco de dados
 
 components:
   securitySchemes:
@@ -238,3 +532,37 @@ components:
           type: string
           description: Contato usado no filtro.
           example: "5521999999999"
+
+    ChatbotEventRequest:
+      type: object
+      additionalProperties: true
+      description: Dados do evento enviados pela aplicação de chatbot.
+      example:
+        id_cliente: 12345
+        dt_interacao: "2026-06-26T14:30:00"
+        bot: CECILia
+
+    ChatbotRecordResponse:
+      type: object
+      required:
+        - ok
+        - inserted_count
+        - event
+      properties:
+        ok:
+          type: boolean
+          description: Indica se o registro foi processado.
+          example: true
+        inserted_count:
+          type: integer
+          description: Quantidade de registros inseridos.
+          example: 1
+        event:
+          type: string
+          description: Evento registrado pela aplicação.
+          example: Registrar Atendimento
+        reference:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Referência de rastreamento retornada em caso de falha.

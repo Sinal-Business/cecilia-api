@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_redoc_html
 from routers.adm import router as adm_router
+from routers.chatbots import router as chatbots_router
 from routers.health import router as health_router
 from routers.validations import router as validations_router
 
@@ -9,10 +10,6 @@ tags_metadata = [
     {
         "name": "General",
         "description": "API for general use"
-    },
-    {
-        "name": "Adm",
-        "description": "API for administrations use"
     },
     {
         "name": "Sinal",
@@ -29,6 +26,10 @@ tags_metadata = [
     {
         "name": "Shopping",
         "description": "API for Shopping data"
+    },
+    {
+        "name": "Chatbots",
+        "description": "API for chatbot application events"
     },
     {
         "name": "Health",
@@ -66,6 +67,7 @@ def custom_redoc():
         title="Cecilia API - Documentação"
     )
 
-app.include_router(health_router)
 app.include_router(validations_router)
 app.include_router(adm_router)
+app.include_router(chatbots_router)
+app.include_router(health_router)

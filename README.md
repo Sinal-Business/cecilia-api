@@ -29,6 +29,7 @@ Service API from Sinal Business
     - [Service status](#service-status)
     - [Validate CPF or CNPJ](#validate-cpf-or-cnpj)
     - [Atualizar Cobrança de Cliente](#atualizar-cobrança-de-cliente)
+    - [Chatbots](#chatbots)
   - [🐳 Docker](#-docker)
   - [⚙️ Environment Variables](#️-environment-variables)
   - [Render Deployment](#render-deployment)
@@ -48,7 +49,8 @@ The CECILia API is a FastAPI service used by the CECILia ecosystem. Version `2.0
 - Bearer token authentication for protected routes.
 - ReDoc and OpenAPI documentation.
 - SQL Server connection support for data-backed services.
-- Adm endpoint for BotConversa collection webhook updates.
+- Sinal Financeiro endpoint for Kanban charge updates.
+- Chatbot application endpoints for registering attendance events.
 - Containerized execution with Docker and Docker Compose.
 
 ## 🧰 Technology
@@ -75,7 +77,8 @@ FastAPI
   +-- Routers
   |     +-- Health and documentation
   |     +-- Document validation
-  |     +-- Adm collection webhook updates
+  |     +-- Sinal Financeiro Kanban updates
+  |     +-- Chatbot attendance event registration
   |
   +-- Services
   |     +-- CPF and CNPJ validation rules
@@ -226,13 +229,13 @@ Request:
 }
 ```
 
-The endpoint filters `dbo.sinal_financeiro_hiscobranca` by `contato`, updates
-all matching invoices, and only changes `status`, `resposta`, and
-`dt_projecao_pgto`. `status` is required; `resposta` and `dt_projecao_pgto`
-are optional. The received `contato` may include `+`, spaces, hyphens, or
-parentheses; the API normalizes it to digits before matching the database.
-`dt_cobranca` is filled automatically by the backend with the current
-São Paulo date and time whenever the update is processed.
+The endpoint updates the customer charge fields used by the Financeiro Kanban
+module. It locates the customer by `contato` and only changes `status`,
+`resposta`, and `dt_projecao_pgto`. `status` is required; `resposta` and
+`dt_projecao_pgto` are optional. The received `contato` may include `+`,
+spaces, hyphens, or parentheses; the application normalizes it to digits before
+matching. `dt_cobranca` is filled automatically by the application with the
+current São Paulo date and time whenever the update is processed.
 
 Response:
 
@@ -241,6 +244,41 @@ Response:
   "ok": true,
   "updated_count": 1,
   "contato": "5521999999999"
+}
+```
+
+### Chatbots
+
+All Chatbots endpoints are protected by the same bearer token and accept
+`POST` requests with JSON payloads from the chatbot application.
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /chatbots/registrarAtendimento` | Registrar Atendimento |
+| `POST /chatbots/registrarContatoInicial` | Registrar Contato Inicial |
+| `POST /chatbots/registrarInteracao` | Registrar Interação |
+| `POST /chatbots/registrarAvaliacaoAtendimento` | Registrar Avaliação de Atendimento |
+| `POST /chatbots/registrarAtendimentoHumano` | Registrar Atendimento Humano |
+| `POST /chatbots/registrarContatoFinal` | Registrar Contato Final |
+| `POST /chatbots/registrarServico` | Registrar Serviço |
+
+Example request:
+
+```json
+{
+  "id_cliente": 12345,
+  "dt_interacao": "2026-06-26T14:30:00",
+  "bot": "CECILia"
+}
+```
+
+Example response:
+
+```json
+{
+  "ok": true,
+  "inserted_count": 1,
+  "event": "Registrar Atendimento"
 }
 ```
 
