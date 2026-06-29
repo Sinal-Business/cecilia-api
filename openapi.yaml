@@ -132,7 +132,7 @@ paths:
       tags:
         - Chatbots
       summary: Registrar Atendimento
-      description: Registra um atendimento iniciado pela aplicação de chatbot.
+      description: Registra o início do atendimento pela aplicação de chatbot.
       security:
         - BearerAuth: []
       requestBody:
@@ -146,9 +146,9 @@ paths:
                 summary: Atendimento iniciado
                 value:
                   id_cliente: "12345"
+                  contato: "+5521999999999"
                   tags: NomeCadastrado
-                  dt_interacao: "2026-06-26T14:30:00"
-                  bot: CECILia
+                  bot: Cecilia
       responses:
         "200":
           description: Registro criado
@@ -171,7 +171,7 @@ paths:
       tags:
         - Chatbots
       summary: Registrar Contato Inicial
-      description: Registra o primeiro contato do cliente na jornada do chatbot.
+      description: Registra o primeiro contato do cliente na jornada.
       security:
         - BearerAuth: []
       requestBody:
@@ -185,10 +185,10 @@ paths:
                 summary: Contato inicial
                 value:
                   id_cliente: "12345"
+                  contato: "+5521999999999"
                   motivo: Financeiro
                   menu: Segunda via
-                  dt_interacao: "2026-06-26T14:31:00"
-                  bot: CECILia
+                  bot: Cecilia
       responses:
         "200":
           description: Registro criado
@@ -211,7 +211,7 @@ paths:
       tags:
         - Chatbots
       summary: Registrar Interação
-      description: Registra uma interação ocorrida durante o atendimento no chatbot.
+      description: Registra uma interação por IA pela aplicação de chatbot.
       security:
         - BearerAuth: []
       requestBody:
@@ -225,10 +225,10 @@ paths:
                 summary: Interação registrada
                 value:
                   id_cliente: 12345
+                  contato: "+5521999999999"
                   id_interacao: 1
                   resumo: Cliente solicitou segunda via do boleto.
-                  dt_interacao: "2026-06-26T14:32:00"
-                  bot: CECILia
+                  bot: Cecilia
       responses:
         "200":
           description: Registro criado
@@ -251,7 +251,7 @@ paths:
       tags:
         - Chatbots
       summary: Registrar Avaliação de Atendimento
-      description: Registra a avaliação enviada pelo cliente ao final do atendimento.
+      description: Registra avaliação de atendimento enviada pelo cliente ao final do atendimento.
       security:
         - BearerAuth: []
       requestBody:
@@ -265,10 +265,10 @@ paths:
                 summary: Avaliação registrada
                 value:
                   id_cliente: 12345
+                  contato: "+5521999999999"
                   nota: "5"
                   comentario: Atendimento rápido.
-                  dt_interacao: "2026-06-26T14:40:00"
-                  bot: CECILia
+                  bot: Cecilia
       responses:
         "200":
           description: Registro criado
@@ -291,7 +291,7 @@ paths:
       tags:
         - Chatbots
       summary: Registrar Atendimento Humano
-      description: Registra o encaminhamento ou atendimento realizado por uma pessoa.
+      description: Registra o momento em que o cliente é encaminhado para atendimento humano.
       security:
         - BearerAuth: []
       requestBody:
@@ -305,10 +305,10 @@ paths:
                 summary: Atendimento humano
                 value:
                   id_cliente: 12345
+                  contato: "+5521999999999"
                   pr_resumo: Cliente pediu suporte humano.
                   tp_atendimento: Financeiro
-                  dt_interacao: "2026-06-26T14:35:00"
-                  bot: CECILia
+                  bot: Cecilia
       responses:
         "200":
           description: Registro criado
@@ -331,7 +331,7 @@ paths:
       tags:
         - Chatbots
       summary: Registrar Contato Final
-      description: Registra o encerramento do contato e se a demanda foi resolvida.
+      description: Registra o encerramento do atendimento e se a demanda do cliente foi resolvida.
       security:
         - BearerAuth: []
       requestBody:
@@ -345,9 +345,9 @@ paths:
                 summary: Contato final
                 value:
                   id_cliente: 12345
+                  contato: "+5521999999999"
                   pr_resolvidosn: S
-                  dt_interacao: "2026-06-26T14:45:00"
-                  bot: CECILia
+                  bot: Cecilia
       responses:
         "200":
           description: Registro criado
@@ -370,7 +370,7 @@ paths:
       tags:
         - Chatbots
       summary: Registrar Serviço
-      description: Registra o serviço solicitado ou executado durante o atendimento.
+      description: Registra solicitações de serviço durante o atendimento do cliente (e.g. segunda via de boleto, registro de ocorrências).
       security:
         - BearerAuth: []
       requestBody:
@@ -384,9 +384,9 @@ paths:
                 summary: Serviço registrado
                 value:
                   id_cliente: 12345
+                  contato: "+5521999999999"
                   servico: Segunda via de boleto
-                  dt_interacao: "2026-06-26T14:33:00"
-                  bot: CECILia
+                  bot: Cecilia
       responses:
         "200":
           description: Registro criado
@@ -536,11 +536,27 @@ components:
     ChatbotEventRequest:
       type: object
       additionalProperties: true
-      description: Dados do evento enviados pela aplicação de chatbot.
+      description: Dados do evento enviados pela aplicação de chatbot. O campo bot é obrigatório. dt_interacao é preenchido automaticamente pela API.
+      required:
+        - bot
+      properties:
+        bot:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Nome do bot responsável pelo atendimento.
+          example: Cecilia
+        contato:
+          anyOf:
+            - type: string
+              maxLength: 255
+            - type: "null"
+          description: Contato do cliente relacionado ao atendimento.
+          example: "+5521999999999"
       example:
         id_cliente: 12345
-        dt_interacao: "2026-06-26T14:30:00"
-        bot: CECILia
+        contato: "+5521999999999"
+        bot: Cecilia
 
     ChatbotRecordResponse:
       type: object

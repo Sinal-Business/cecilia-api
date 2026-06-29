@@ -21,87 +21,93 @@ router = APIRouter(
 logger = logging.getLogger(__name__)
 
 IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+BOT_FIELD = "bot"
+BACKEND_TIMESTAMP_FIELD = "dt_interacao"
+BACKEND_TIMESTAMP_SQL = (
+    "CONVERT(datetime2(0), "
+    "SYSDATETIMEOFFSET() AT TIME ZONE 'E. South America Standard Time')"
+)
 
 ENDPOINTS = {
     "registrarAtendimento": {
         "table": "dbo.sinal_ceciliachat_atendimentos",
         "summary": "Registrar Atendimento",
-        "description": "Registra um atendimento iniciado pela aplicacao de chatbot.",
+        "description": "Registra o início do atendimento pela aplicação de chatbot.",
         "example": {
             "id_cliente": "12345",
+            "contato": "+5521999999999",
             "tags": "NomeCadastrado",
-            "dt_interacao": "2026-06-26T14:30:00",
-            "bot": "CECILia",
+            "bot": "Cecilia",
         },
     },
     "registrarContatoInicial": {
         "table": "dbo.sinal_ceciliachat_contatoinicial",
         "summary": "Registrar Contato Inicial",
-        "description": "Registra o primeiro contato do cliente na jornada do chatbot.",
+        "description": "Registra o primeiro contato do cliente na jornada.",
         "example": {
             "id_cliente": "12345",
+            "contato": "+5521999999999",
             "motivo": "Financeiro",
             "menu": "Segunda via",
-            "dt_interacao": "2026-06-26T14:31:00",
-            "bot": "CECILia",
+            "bot": "Cecilia",
         },
     },
     "registrarInteracao": {
         "table": "dbo.sinal_ceciliachat_interacoes",
-        "summary": "Registrar Interacao",
-        "description": "Registra uma interacao ocorrida durante o atendimento no chatbot.",
+        "summary": "Registrar Interação",
+        "description": "Registra uma interação por IA pela aplicação de chatbot.",
         "example": {
             "id_cliente": 12345,
+            "contato": "+5521999999999",
             "id_interacao": 1,
             "resumo": "Cliente solicitou segunda via do boleto.",
-            "dt_interacao": "2026-06-26T14:32:00",
-            "bot": "CECILia",
+            "bot": "Cecilia",
         },
     },
     "registrarAvaliacaoAtendimento": {
         "table": "dbo.sinal_ceciliachat_avaliacoes",
-        "summary": "Registrar Avaliacao de Atendimento",
-        "description": "Registra a avaliacao enviada pelo cliente ao final do atendimento.",
+        "summary": "Registrar Avaliação de Atendimento",
+        "description": "Registra avaliação de atendimento enviada pelo cliente ao final do atendimento.",
         "example": {
             "id_cliente": 12345,
+            "contato": "+5521999999999",
             "nota": "5",
-            "comentario": "Atendimento rapido.",
-            "dt_interacao": "2026-06-26T14:40:00",
-            "bot": "CECILia",
+            "comentario": "Atendimento rápido.",
+            "bot": "Cecilia",
         },
     },
     "registrarAtendimentoHumano": {
         "table": "dbo.sinal_ceciliachat_atenhumano",
         "summary": "Registrar Atendimento Humano",
-        "description": "Registra o encaminhamento ou atendimento realizado por uma pessoa.",
+        "description": "Registra o momento em que o cliente é encaminhado para atendimento humano.",
         "example": {
             "id_cliente": 12345,
+            "contato": "+5521999999999",
             "pr_resumo": "Cliente pediu suporte humano.",
             "tp_atendimento": "Financeiro",
-            "dt_interacao": "2026-06-26T14:35:00",
-            "bot": "CECILia",
+            "bot": "Cecilia",
         },
     },
     "registrarContatoFinal": {
         "table": "dbo.sinal_ceciliachat_contatofinal",
         "summary": "Registrar Contato Final",
-        "description": "Registra o encerramento do contato e se a demanda foi resolvida.",
+        "description": "Registra o encerramento do atendimento e se a demanda do cliente foi resolvida.",
         "example": {
             "id_cliente": 12345,
+            "contato": "+5521999999999",
             "pr_resolvidosn": "S",
-            "dt_interacao": "2026-06-26T14:45:00",
-            "bot": "CECILia",
+            "bot": "Cecilia",
         },
     },
     "registrarServico": {
         "table": "dbo.sinal_ceciliachat_servicos",
-        "summary": "Registrar Servico",
-        "description": "Registra o servico solicitado ou executado durante o atendimento.",
+        "summary": "Registrar Serviço",
+        "description": "Registra solicitações de serviço durante o atendimento do cliente (e.g. segunda via de boleto, registro de ocorrências).",
         "example": {
             "id_cliente": 12345,
+            "contato": "+5521999999999",
             "servico": "Segunda via de boleto",
-            "dt_interacao": "2026-06-26T14:33:00",
-            "bot": "CECILia",
+            "bot": "Cecilia",
         },
     },
 }
@@ -126,6 +132,12 @@ def normalize_value(value: Any) -> Any:
     if isinstance(encoded, (dict, list)):
         return json.dumps(encoded, ensure_ascii=False)
     return encoded
+
+
+def payload_to_dict(payload: ChatbotPayload) -> Dict[str, Any]:
+    if hasattr(payload, "model_dump"):
+        return payload.model_dump(exclude_unset=True)
+    return payload.dict(exclude_unset=True)
 
 
 def get_writable_columns(cursor, table_name: str) -> Set[str]:
@@ -153,6 +165,16 @@ def validate_payload(payload: Dict[str, Any], writable_columns: Iterable[str]) -
     if not payload:
         raise HTTPException(status_code=400, detail="Payload vazio")
 
+    bot = payload.get(BOT_FIELD)
+    if bot is None or str(bot).strip() == "":
+        raise HTTPException(status_code=422, detail="bot e obrigatorio")
+
+    if BACKEND_TIMESTAMP_FIELD in payload:
+        raise HTTPException(
+            status_code=422,
+            detail=f"{BACKEND_TIMESTAMP_FIELD} e preenchido automaticamente pela aplicacao",
+        )
+
     writable = set(writable_columns)
     invalid_columns = sorted(set(payload) - writable)
     if invalid_columns:
@@ -176,10 +198,13 @@ def insert_chatbot_record(route_name: str, payload: ChatbotPayload):
             conn.timeout = 20
             cursor = conn.cursor()
             writable_columns = get_writable_columns(cursor, table_name)
-            values = validate_payload(dict(payload), writable_columns)
+            values = validate_payload(payload_to_dict(payload), writable_columns)
 
-            columns_sql = ", ".join(quote_identifier(column) for column in values)
-            placeholders = ", ".join("?" for _ in values)
+            columns_sql = ", ".join(
+                [quote_identifier(column) for column in values]
+                + [quote_identifier(BACKEND_TIMESTAMP_FIELD)]
+            )
+            placeholders = ", ".join(["?" for _ in values] + [BACKEND_TIMESTAMP_SQL])
             cursor.execute(
                 f"INSERT INTO {table_name} ({columns_sql}) VALUES ({placeholders})",
                 *values.values(),
@@ -217,7 +242,7 @@ def register_endpoint(route_name: str, config: Dict[str, Any]) -> None:
     def endpoint(
         payload: ChatbotPayload = Body(
             ...,
-            description="Dados do evento enviados pela aplicacao de chatbot",
+            description="Dados do evento enviados pela aplicacao de chatbot. O campo bot e obrigatorio; dt_interacao e preenchido automaticamente pela API.",
             examples=[config["example"]],
         )
     ):

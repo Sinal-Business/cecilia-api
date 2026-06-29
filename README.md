@@ -250,7 +250,9 @@ Response:
 ### Chatbots
 
 All Chatbots endpoints are protected by the same bearer token and accept
-`POST` requests with JSON payloads from the chatbot application.
+`POST` requests with JSON payloads from the chatbot application. The `bot`
+field is required, `contato` is accepted for the customer contact, and
+`dt_interacao` is filled automatically by the API.
 
 | Endpoint | Purpose |
 | --- | --- |
@@ -267,8 +269,8 @@ Example request:
 ```json
 {
   "id_cliente": 12345,
-  "dt_interacao": "2026-06-26T14:30:00",
-  "bot": "CECILia"
+  "contato": "+5521999999999",
+  "bot": "Cecilia"
 }
 ```
 

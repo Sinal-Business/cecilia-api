@@ -1,6 +1,25 @@
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from pydantic import BaseModel, Field
+
+
+class ChatbotPayload(BaseModel):
+    bot: str = Field(
+        ...,
+        description="Nome do bot responsavel pelo atendimento",
+        examples=["Cecilia"],
+        min_length=1,
+        max_length=255,
+    )
+    contato: Optional[str] = Field(
+        None,
+        description="Contato do cliente relacionado ao atendimento",
+        examples=["+5521999999999"],
+        max_length=255,
+    )
+
+    class Config:
+        extra = "allow"
 
 
 class ChatbotRecordResponse(BaseModel):
@@ -11,6 +30,3 @@ class ChatbotRecordResponse(BaseModel):
         None,
         description="Referencia de rastreamento retornada em caso de falha",
     )
-
-
-ChatbotPayload = Dict[str, Any]
