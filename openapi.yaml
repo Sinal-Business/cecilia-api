@@ -536,15 +536,22 @@ components:
     ChatbotEventRequest:
       type: object
       additionalProperties: true
-      description: Dados do evento enviados pela aplicação de chatbot. O campo bot é obrigatório. dt_interacao é preenchido automaticamente pela API.
+      description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios. contato e os dados específicos do evento são opcionais. dt_interacao é preenchido automaticamente pela API.
       required:
+        - id_cliente
         - bot
       properties:
+        id_cliente:
+          anyOf:
+            - type: string
+            - type: integer
+          description: Identificador do cliente na aplicação de chatbot.
+          example: "12345"
         bot:
           type: string
           minLength: 1
           maxLength: 255
-          description: Nome do bot responsável pelo atendimento.
+          description: Nome do bot/interface responsável pelo atendimento.
           example: Cecilia
         contato:
           anyOf:
@@ -553,6 +560,73 @@ components:
             - type: "null"
           description: Contato do cliente relacionado ao atendimento.
           example: "+5521999999999"
+        tags:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Tags associadas ao atendimento.
+          example: NomeCadastrado
+        motivo:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Motivo informado no primeiro contato.
+          example: Financeiro
+        menu:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Opção de menu selecionada pelo cliente.
+          example: Segunda via
+        id_interacao:
+          anyOf:
+            - type: integer
+            - type: string
+            - type: "null"
+          description: Identificador da interação na jornada do atendimento.
+          example: 1
+        resumo:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Resumo da interação por IA.
+          example: Cliente solicitou segunda via do boleto.
+        nota:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Nota da avaliação enviada pelo cliente.
+          example: "5"
+        comentario:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Comentário da avaliação enviada pelo cliente.
+          example: Atendimento rápido.
+        pr_resumo:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Resumo do encaminhamento para atendimento humano.
+          example: Cliente pediu suporte humano.
+        tp_atendimento:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Tipo de atendimento humano solicitado.
+          example: Financeiro
+        pr_resolvidosn:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Indica se a demanda do cliente foi resolvida.
+          example: S
+        servico:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Serviço solicitado durante o atendimento.
+          example: Segunda via de boleto
       example:
         id_cliente: 12345
         contato: "+5521999999999"

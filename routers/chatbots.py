@@ -21,6 +21,7 @@ router = APIRouter(
 logger = logging.getLogger(__name__)
 
 IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+CLIENT_ID_FIELD = "id_cliente"
 BOT_FIELD = "bot"
 BACKEND_TIMESTAMP_FIELD = "dt_interacao"
 BACKEND_TIMESTAMP_SQL = (
@@ -165,6 +166,10 @@ def validate_payload(payload: Dict[str, Any], writable_columns: Iterable[str]) -
     if not payload:
         raise HTTPException(status_code=400, detail="Payload vazio")
 
+    id_cliente = payload.get(CLIENT_ID_FIELD)
+    if id_cliente is None or str(id_cliente).strip() == "":
+        raise HTTPException(status_code=422, detail="id_cliente e obrigatorio")
+
     bot = payload.get(BOT_FIELD)
     if bot is None or str(bot).strip() == "":
         raise HTTPException(status_code=422, detail="bot e obrigatorio")
@@ -242,7 +247,7 @@ def register_endpoint(route_name: str, config: Dict[str, Any]) -> None:
     def endpoint(
         payload: ChatbotPayload = Body(
             ...,
-            description="Dados do evento enviados pela aplicacao de chatbot. O campo bot e obrigatorio; dt_interacao e preenchido automaticamente pela API.",
+            description="Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.",
             examples=[config["example"]],
         )
     ):
