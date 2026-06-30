@@ -268,7 +268,7 @@ Example request:
 
 ```json
 {
-  "id_cliente": 12345,
+  "id_cliente": "10346316758",
   "contato": "+5521999999999",
   "bot": "Cecilia"
 }

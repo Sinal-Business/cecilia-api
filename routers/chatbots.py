@@ -46,7 +46,7 @@ ENDPOINTS = {
         "summary": "Registrar Atendimento",
         "description": "Registra o início do atendimento pela aplicação de chatbot.",
         "example": {
-            "id_cliente": "12345",
+            "id_cliente": "10346316758",
             "contato": "+5521999999999",
             "tags": "NomeCadastrado",
             "bot": "Cecilia",
@@ -58,7 +58,7 @@ ENDPOINTS = {
         "summary": "Registrar Contato Inicial",
         "description": "Registra o primeiro contato do cliente na jornada.",
         "example": {
-            "id_cliente": "12345",
+            "id_cliente": "10346316758",
             "contato": "+5521999999999",
             "motivo": "Financeiro",
             "menu": "Segunda via",
@@ -71,7 +71,7 @@ ENDPOINTS = {
         "summary": "Registrar Interação",
         "description": "Registra uma interação por IA pela aplicação de chatbot.",
         "example": {
-            "id_cliente": 12345,
+            "id_cliente": "10346316758",
             "contato": "+5521999999999",
             "id_interacao": 1,
             "resumo": "Cliente solicitou segunda via do boleto.",
@@ -84,7 +84,7 @@ ENDPOINTS = {
         "summary": "Registrar Avaliação de Atendimento",
         "description": "Registra avaliação de atendimento enviada pelo cliente ao final do atendimento.",
         "example": {
-            "id_cliente": 12345,
+            "id_cliente": "10346316758",
             "contato": "+5521999999999",
             "nota": "5",
             "comentario": "Atendimento rápido.",
@@ -97,7 +97,7 @@ ENDPOINTS = {
         "summary": "Registrar Atendimento Humano",
         "description": "Registra o momento em que o cliente é encaminhado para atendimento humano.",
         "example": {
-            "id_cliente": 12345,
+            "id_cliente": "10346316758",
             "contato": "+5521999999999",
             "pr_resumo": "Cliente pediu suporte humano.",
             "tp_atendimento": "Financeiro",
@@ -110,7 +110,7 @@ ENDPOINTS = {
         "summary": "Registrar Contato Final",
         "description": "Registra o encerramento do atendimento e se a demanda do cliente foi resolvida.",
         "example": {
-            "id_cliente": 12345,
+            "id_cliente": "10346316758",
             "contato": "+5521999999999",
             "pr_resolvidosn": "S",
             "bot": "Cecilia",
@@ -122,7 +122,7 @@ ENDPOINTS = {
         "summary": "Registrar Serviço",
         "description": "Registra solicitações de serviço durante o atendimento do cliente (e.g. segunda via de boleto, registro de ocorrências).",
         "example": {
-            "id_cliente": 12345,
+            "id_cliente": "10346316758",
             "contato": "+5521999999999",
             "servico": "Segunda via de boleto",
             "bot": "Cecilia",
@@ -186,6 +186,7 @@ def validate_payload(payload: Dict[str, Any], writable_columns: Iterable[str]) -
     id_cliente = payload.get(CLIENT_ID_FIELD)
     if id_cliente is None or str(id_cliente).strip() == "":
         raise HTTPException(status_code=422, detail="id_cliente e obrigatorio")
+    payload[CLIENT_ID_FIELD] = str(id_cliente).strip()
 
     bot = payload.get(BOT_FIELD)
     if bot is None or str(bot).strip() == "":

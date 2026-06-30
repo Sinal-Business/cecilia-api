@@ -536,15 +536,22 @@ components:
     ChatbotEventRequest:
       type: object
       additionalProperties: true
-      description: Dados do evento enviados pela aplicação de chatbot. O campo bot é obrigatório. dt_interacao é preenchido automaticamente pela API.
+      description: Campos comuns dos eventos de chatbot. Os campos id_cliente e bot são obrigatórios. contato é opcional. dt_interacao é preenchido automaticamente pela API.
       required:
+        - id_cliente
         - bot
       properties:
+        id_cliente:
+          anyOf:
+            - type: string
+            - type: integer
+          description: Identificador do cliente na aplicação de chatbot.
+          example: "10346316758"
         bot:
           type: string
           minLength: 1
           maxLength: 255
-          description: Nome do bot responsável pelo atendimento.
+          description: Nome do bot/interface responsável pelo atendimento.
           example: Cecilia
         contato:
           anyOf:
@@ -554,9 +561,118 @@ components:
           description: Contato do cliente relacionado ao atendimento.
           example: "+5521999999999"
       example:
-        id_cliente: 12345
+        id_cliente: "10346316758"
         contato: "+5521999999999"
         bot: Cecilia
+
+    RegistrarAtendimentoRequest:
+      allOf:
+        - $ref: "#/components/schemas/ChatbotEventRequest"
+        - type: object
+          properties:
+            tags:
+              anyOf:
+                - type: string
+                - type: "null"
+              description: Tags associadas ao atendimento.
+              example: NomeCadastrado
+
+    RegistrarContatoInicialRequest:
+      allOf:
+        - $ref: "#/components/schemas/ChatbotEventRequest"
+        - type: object
+          properties:
+            motivo:
+              anyOf:
+                - type: string
+                - type: "null"
+              description: Motivo informado no primeiro contato.
+              example: Financeiro
+            menu:
+              anyOf:
+                - type: string
+                - type: "null"
+              description: Opção de menu selecionada pelo cliente.
+              example: Segunda via
+
+    RegistrarInteracaoRequest:
+      allOf:
+        - $ref: "#/components/schemas/ChatbotEventRequest"
+        - type: object
+          properties:
+            id_interacao:
+              anyOf:
+                - type: integer
+                - type: string
+                - type: "null"
+              description: Identificador da interação na jornada do atendimento.
+              example: 1
+            resumo:
+              anyOf:
+                - type: string
+                - type: "null"
+              description: Resumo da interação por IA.
+              example: Cliente solicitou segunda via do boleto.
+
+    RegistrarAvaliacaoAtendimentoRequest:
+      allOf:
+        - $ref: "#/components/schemas/ChatbotEventRequest"
+        - type: object
+          properties:
+            nota:
+              anyOf:
+                - type: string
+                - type: "null"
+              description: Nota da avaliação enviada pelo cliente.
+              example: "5"
+            comentario:
+              anyOf:
+                - type: string
+                - type: "null"
+              description: Comentário da avaliação enviada pelo cliente.
+              example: Atendimento rápido.
+
+    RegistrarAtendimentoHumanoRequest:
+      allOf:
+        - $ref: "#/components/schemas/ChatbotEventRequest"
+        - type: object
+          properties:
+            pr_resumo:
+              anyOf:
+                - type: string
+                - type: "null"
+              description: Resumo do encaminhamento para atendimento humano.
+              example: Cliente pediu suporte humano.
+            tp_atendimento:
+              anyOf:
+                - type: string
+                - type: "null"
+              description: Tipo de atendimento humano solicitado.
+              example: Financeiro
+
+    RegistrarContatoFinalRequest:
+      allOf:
+        - $ref: "#/components/schemas/ChatbotEventRequest"
+        - type: object
+          properties:
+            pr_resolvidosn:
+              anyOf:
+                - type: string
+                - type: "null"
+              description: Indica se a demanda do cliente foi resolvida.
+              example: S
+
+    RegistrarServicoRequest:
+      allOf:
+        - $ref: "#/components/schemas/ChatbotEventRequest"
+        - type: object
+          properties:
+            servico:
+              anyOf:
+                - type: string
+                - type: "null"
+              description: Serviço solicitado durante o atendimento.
+              example: Segunda via de boleto
 
     ChatbotRecordResponse:
       type: object

@@ -7,7 +7,7 @@ class ChatbotBasePayload(BaseModel):
     id_cliente: Union[str, int] = Field(
         ...,
         description="Identificador do cliente na aplicação de chatbot",
-        examples=["12345"],
+        examples=["10346316758"],
     )
     bot: str = Field(
         ...,
