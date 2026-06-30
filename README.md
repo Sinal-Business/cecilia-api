@@ -250,9 +250,8 @@ Response:
 ### Chatbots
 
 All Chatbots endpoints are protected by the same bearer token and accept
-`POST` requests with JSON payloads from the chatbot application. The
-`id_cliente` and `bot` fields are required. `contato` and the event-specific
-fields, such as `tags`, `menu`, `motivo`, and `resumo`, are optional.
+`POST` requests with JSON payloads from the chatbot application. The `bot`
+field is required, `contato` is accepted for the customer contact, and
 `dt_interacao` is filled automatically by the API.
 
 | Endpoint | Purpose |

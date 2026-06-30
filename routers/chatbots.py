@@ -10,7 +10,17 @@ from fastapi.responses import JSONResponse
 
 from core.auth import verify
 from core.database import get_sqlserver_connection
-from schemas.chatbots import ChatbotPayload, ChatbotRecordResponse
+from schemas.chatbots import (
+    ChatbotBasePayload,
+    ChatbotRecordResponse,
+    RegistrarAtendimentoHumanoPayload,
+    RegistrarAtendimentoPayload,
+    RegistrarAvaliacaoAtendimentoPayload,
+    RegistrarContatoFinalPayload,
+    RegistrarContatoInicialPayload,
+    RegistrarInteracaoPayload,
+    RegistrarServicoPayload,
+)
 
 
 router = APIRouter(
@@ -31,6 +41,7 @@ BACKEND_TIMESTAMP_SQL = (
 
 ENDPOINTS = {
     "registrarAtendimento": {
+        "model": RegistrarAtendimentoPayload,
         "table": "dbo.sinal_ceciliachat_atendimentos",
         "summary": "Registrar Atendimento",
         "description": "Registra o início do atendimento pela aplicação de chatbot.",
@@ -42,6 +53,7 @@ ENDPOINTS = {
         },
     },
     "registrarContatoInicial": {
+        "model": RegistrarContatoInicialPayload,
         "table": "dbo.sinal_ceciliachat_contatoinicial",
         "summary": "Registrar Contato Inicial",
         "description": "Registra o primeiro contato do cliente na jornada.",
@@ -54,6 +66,7 @@ ENDPOINTS = {
         },
     },
     "registrarInteracao": {
+        "model": RegistrarInteracaoPayload,
         "table": "dbo.sinal_ceciliachat_interacoes",
         "summary": "Registrar Interação",
         "description": "Registra uma interação por IA pela aplicação de chatbot.",
@@ -66,6 +79,7 @@ ENDPOINTS = {
         },
     },
     "registrarAvaliacaoAtendimento": {
+        "model": RegistrarAvaliacaoAtendimentoPayload,
         "table": "dbo.sinal_ceciliachat_avaliacoes",
         "summary": "Registrar Avaliação de Atendimento",
         "description": "Registra avaliação de atendimento enviada pelo cliente ao final do atendimento.",
@@ -78,6 +92,7 @@ ENDPOINTS = {
         },
     },
     "registrarAtendimentoHumano": {
+        "model": RegistrarAtendimentoHumanoPayload,
         "table": "dbo.sinal_ceciliachat_atenhumano",
         "summary": "Registrar Atendimento Humano",
         "description": "Registra o momento em que o cliente é encaminhado para atendimento humano.",
@@ -90,6 +105,7 @@ ENDPOINTS = {
         },
     },
     "registrarContatoFinal": {
+        "model": RegistrarContatoFinalPayload,
         "table": "dbo.sinal_ceciliachat_contatofinal",
         "summary": "Registrar Contato Final",
         "description": "Registra o encerramento do atendimento e se a demanda do cliente foi resolvida.",
@@ -101,6 +117,7 @@ ENDPOINTS = {
         },
     },
     "registrarServico": {
+        "model": RegistrarServicoPayload,
         "table": "dbo.sinal_ceciliachat_servicos",
         "summary": "Registrar Serviço",
         "description": "Registra solicitações de serviço durante o atendimento do cliente (e.g. segunda via de boleto, registro de ocorrências).",
@@ -135,7 +152,7 @@ def normalize_value(value: Any) -> Any:
     return encoded
 
 
-def payload_to_dict(payload: ChatbotPayload) -> Dict[str, Any]:
+def payload_to_dict(payload: ChatbotBasePayload) -> Dict[str, Any]:
     if hasattr(payload, "model_dump"):
         return payload.model_dump(exclude_unset=True)
     return payload.dict(exclude_unset=True)
@@ -194,7 +211,7 @@ def validate_payload(payload: Dict[str, Any], writable_columns: Iterable[str]) -
     return {key: normalize_value(value) for key, value in payload.items()}
 
 
-def insert_chatbot_record(route_name: str, payload: ChatbotPayload):
+def insert_chatbot_record(route_name: str, payload: ChatbotBasePayload):
     config = ENDPOINTS[route_name]
     table_name = config["table"]
 
@@ -244,8 +261,10 @@ def insert_chatbot_record(route_name: str, payload: ChatbotPayload):
 
 
 def register_endpoint(route_name: str, config: Dict[str, Any]) -> None:
+    payload_model = config["model"]
+
     def endpoint(
-        payload: ChatbotPayload = Body(
+        payload: payload_model = Body(
             ...,
             description="Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.",
             examples=[config["example"]],

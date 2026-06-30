@@ -3,7 +3,7 @@ from typing import Optional, Union
 from pydantic import BaseModel, Field
 
 
-class ChatbotPayload(BaseModel):
+class ChatbotBasePayload(BaseModel):
     id_cliente: Union[str, int] = Field(
         ...,
         description="Identificador do cliente na aplicação de chatbot",
@@ -22,11 +22,20 @@ class ChatbotPayload(BaseModel):
         examples=["+5521999999999"],
         max_length=255,
     )
+
+    class Config:
+        extra = "forbid"
+
+
+class RegistrarAtendimentoPayload(ChatbotBasePayload):
     tags: Optional[str] = Field(
         None,
         description="Tags associadas ao atendimento",
         examples=["NomeCadastrado"],
     )
+
+
+class RegistrarContatoInicialPayload(ChatbotBasePayload):
     motivo: Optional[str] = Field(
         None,
         description="Motivo informado no primeiro contato",
@@ -37,6 +46,9 @@ class ChatbotPayload(BaseModel):
         description="Opção de menu selecionada pelo cliente",
         examples=["Segunda via"],
     )
+
+
+class RegistrarInteracaoPayload(ChatbotBasePayload):
     id_interacao: Optional[Union[int, str]] = Field(
         None,
         description="Identificador da interação na jornada do atendimento",
@@ -47,6 +59,9 @@ class ChatbotPayload(BaseModel):
         description="Resumo da interação por IA",
         examples=["Cliente solicitou segunda via do boleto."],
     )
+
+
+class RegistrarAvaliacaoAtendimentoPayload(ChatbotBasePayload):
     nota: Optional[str] = Field(
         None,
         description="Nota da avaliação enviada pelo cliente",
@@ -57,6 +72,9 @@ class ChatbotPayload(BaseModel):
         description="Comentário da avaliação enviada pelo cliente",
         examples=["Atendimento rápido."],
     )
+
+
+class RegistrarAtendimentoHumanoPayload(ChatbotBasePayload):
     pr_resumo: Optional[str] = Field(
         None,
         description="Resumo do encaminhamento para atendimento humano",
@@ -67,19 +85,22 @@ class ChatbotPayload(BaseModel):
         description="Tipo de atendimento humano solicitado",
         examples=["Financeiro"],
     )
+
+
+class RegistrarContatoFinalPayload(ChatbotBasePayload):
     pr_resolvidosn: Optional[str] = Field(
         None,
         description="Indica se a demanda do cliente foi resolvida",
         examples=["S"],
     )
+
+
+class RegistrarServicoPayload(ChatbotBasePayload):
     servico: Optional[str] = Field(
         None,
         description="Serviço solicitado durante o atendimento",
         examples=["Segunda via de boleto"],
     )
-
-    class Config:
-        extra = "allow"
 
 
 class ChatbotRecordResponse(BaseModel):
