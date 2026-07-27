@@ -1,7 +1,10 @@
 from fastapi import APIRouter, Body, Depends
 from core.auth import verify
-from schemas.validations import ValidateDocumentInput, ValidateDocumentResponse
+from schemas.validations import (
+    ValidateDocumentInput, ValidateDocumentResponse, ValidateNameInput, ValidateNameResponse
+)
 from services.docvalid import validate_cnpj, validate_cpf
+from services.namevalid import validate_name
 
 
 router = APIRouter(
@@ -9,6 +12,31 @@ router = APIRouter(
     tags=["General"],
     dependencies=[Depends(verify)]
 )
+@router.post(
+    "/name",
+    response_model=ValidateNameResponse,
+    operation_id="validarNome",
+    summary="Validar Nome",
+    description="Valida e formata o nome informado pelo cliente via WhatsApp.",
+    responses={
+        200: {
+            "description": "Resultado da validação do nome",
+            "content": {"application/json": {"example": {
+                "nome_original": "maria DA silva",
+                "nome_tratado": "Maria da Silva",
+                "nome_valido": True,
+                "status_nome": "VALID_NAME",
+                "motivo_nome_invalido": "",
+            }}},
+        },
+        403: {"description": "Token inválido ou ausente"},
+        422: {"description": "Payload inválido"},
+    },
+)
+def validate_client_name(payload: ValidateNameInput):
+    return validate_name(payload.nome)
+
+
 @router.post(
     "/document",
     response_model=ValidateDocumentResponse,

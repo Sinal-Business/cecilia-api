@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 from pydantic import BaseModel, Field
 
 
@@ -30,3 +30,15 @@ class ValidateDocumentResponse(BaseModel):
         None,
         description="Mensagem pronta para retorno ao usuário"
     )
+
+
+class ValidateNameInput(BaseModel):
+    nome: Any = Field(None, description="Nome recebido pelo BotConversa", examples=["Maria da Silva"])
+
+
+class ValidateNameResponse(BaseModel):
+    nome_original: str
+    nome_tratado: str
+    nome_valido: bool
+    status_nome: Literal["VALID_NAME", "INVALID_NAME"]
+    motivo_nome_invalido: str
