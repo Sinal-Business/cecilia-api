@@ -33,12 +33,31 @@ class ValidateDocumentResponse(BaseModel):
 
 
 class ValidateNameInput(BaseModel):
-    nome: Any = Field(None, description="Nome recebido pelo BotConversa", examples=["Maria da Silva"])
+    nome: Any = Field(
+        None,
+        description="Nome a ser validado, exatamente como foi recebido pelo sistema de origem",
+        examples=["Maria da Silva"]
+    )
 
 
 class ValidateNameResponse(BaseModel):
-    nome_original: str
-    nome_tratado: str
-    nome_valido: bool
-    status_nome: Literal["VALID_NAME", "INVALID_NAME"]
-    motivo_nome_invalido: str
+    nome_original: str = Field(
+        ...,
+        description="Valor recebido após a remoção de espaços no início e no final"
+    )
+    nome_tratado: str = Field(
+        ...,
+        description="Nome com espaços e capitalização padronizados"
+    )
+    nome_valido: bool = Field(
+        ...,
+        description="Indica se o valor atende às regras de validação de nome"
+    )
+    status_nome: Literal["VALID_NAME", "INVALID_NAME"] = Field(
+        ...,
+        description="Status técnico da validação do nome"
+    )
+    motivo_nome_invalido: str = Field(
+        ...,
+        description="Motivo da rejeição; retorna uma string vazia quando o nome é válido"
+    )

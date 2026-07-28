@@ -17,7 +17,31 @@ router = APIRouter(
     response_model=ValidateNameResponse,
     operation_id="validarNome",
     summary="Validar Nome",
-    description="Valida e formata o nome informado pelo cliente via WhatsApp.",
+    description="""
+Valida e formata um nome recebido por qualquer sistema de origem.
+
+### Regras aplicadas
+- O valor deve conter entre 2 e 60 caracteres após a remoção de espaços nas extremidades
+- Não pode conter números, CPF, CNPJ, endereço de e-mail ou link
+- Aceita letras, espaços, apóstrofos e hífens
+- Cada palavra deve ter pelo menos 2 caracteres, exceto os conectores `da`, `de`, `do`, `das`, `dos` e `e`
+- Deve conter pelo menos uma palavra de nome além dos conectores aceitos
+- Rejeita palavras relacionadas a solicitações, como boleto, pagamento, contrato, suporte e manutenção
+- Rejeita textos que aparentem ser frases em vez de nomes
+
+### Tratamento aplicado
+- Remove espaços no início e no final
+- Substitui sequências de espaços por um único espaço
+- Coloca a inicial de cada palavra em maiúscula e as demais letras em minúscula
+- Mantém os conectores aceitos em minúsculas
+
+### Campos retornados
+- `nome_original`: valor recebido após a remoção de espaços nas extremidades
+- `nome_tratado`: nome com espaços e capitalização padronizados
+- `nome_valido`: booleano que indica o resultado da validação
+- `status_nome`: `VALID_NAME` ou `INVALID_NAME`
+- `motivo_nome_invalido`: motivo da rejeição; vazio quando o nome é válido
+""",
     responses={
         200: {
             "description": "Resultado da validação do nome",
