@@ -32,7 +32,7 @@ Service API from Sinal Business
     - [Chatbots](#chatbots)
   - [🐳 Docker](#-docker)
   - [⚙️ Environment Variables](#️-environment-variables)
-  - [Render Deployment](#render-deployment)
+  - [☁️ Render Deployment](#️-render-deployment)
   - [📁 Project Structure](#-project-structure)
   - [🛡️ Security](#️-security)
 
@@ -324,7 +324,7 @@ SQL_SERVER_PASSWORD=your-password
 PORT=8000
 ```
 
-## Render Deployment
+## ☁️ Render Deployment
 
 Deploy this service as a Docker Web Service, not as the native Python runtime.
 The Docker image installs Microsoft's SQL Server ODBC driver, which is required
