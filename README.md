@@ -133,7 +133,9 @@ The local service will be available at:
 
 ## 🔐 Authentication
 
-Protected routes require the token configured in the `TOKEN` environment variable.
+Protected routes require a bearer token configured in `TOKEN` or the optional
+`TOKEN_SECONDARY` environment variable. This supports token rotation or a
+separate integration token without interrupting existing callers.
 
 ```http
 Authorization: Bearer <TOKEN>
@@ -304,7 +306,8 @@ docker compose down
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `TOKEN` | Yes | Bearer token accepted by protected endpoints |
+| `TOKEN` | Yes | Primary bearer token accepted by protected endpoints |
+| `TOKEN_SECONDARY` | No | Optional second active bearer token for a separate integration or rotation window |
 | `DATABASE_URL` | For database access | Full SQL Server ODBC connection string; preferred for Render |
 | `SQL_SERVER_HOST` | Fallback database access | SQL Server hostname when `DATABASE_URL` is not set |
 | `SQL_SERVER_DB` | Fallback database access | Database name when `DATABASE_URL` is not set |
@@ -316,6 +319,7 @@ Example with placeholders only:
 
 ```dotenv
 TOKEN=replace-with-a-strong-random-token
+TOKEN_SECONDARY=optional-second-strong-random-token
 DATABASE_URL=Driver={ODBC Driver 18 for SQL Server};Server=tcp:your-server.database.windows.net,1433;Database=your-database;Uid=your-user;Pwd=your-password;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;
 SQL_SERVER_HOST=your-server
 SQL_SERVER_DB=your-database
@@ -336,7 +340,7 @@ Recommended Render settings:
 | --- | --- |
 | Runtime | Docker |
 | Dockerfile Path | `./dockerfile` |
-| Environment variables | `TOKEN`, `DATABASE_URL` |
+| Environment variables | `TOKEN`, optional `TOKEN_SECONDARY`, `DATABASE_URL` |
 
 If the service is deployed as Python instead of Docker, SQL Server routes can
 fail with:
