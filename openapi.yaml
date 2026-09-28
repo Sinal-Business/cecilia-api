@@ -556,22 +556,22 @@ paths:
       parameters:
       - name: start_date
         in: query
-        required: false
+        required: true
         schema:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
+          type: string
+          format: date
+          description: Data inicial inclusiva
           title: Start Date
+        description: Data inicial inclusiva
       - name: end_date
         in: query
-        required: false
+        required: true
         schema:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
+          type: string
+          format: date
+          description: Data final inclusiva; máximo de 31 dias
           title: End Date
+        description: Data final inclusiva; máximo de 31 dias
       - name: limit
         in: query
         required: false
@@ -586,6 +586,7 @@ paths:
         required: false
         schema:
           type: integer
+          maximum: 10000
           minimum: 0
           default: 0
           title: Offset
@@ -619,7 +620,7 @@ paths:
         required: false
         schema:
           type: integer
-          maximum: 500
+          maximum: 100
           minimum: 1
           default: 100
           title: Limit
@@ -628,6 +629,7 @@ paths:
         required: false
         schema:
           type: integer
+          maximum: 1000
           minimum: 0
           default: 0
           title: Offset
@@ -658,22 +660,22 @@ paths:
       parameters:
       - name: start_date
         in: query
-        required: false
+        required: true
         schema:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
+          type: string
+          format: date
+          description: Data inicial inclusiva
           title: Start Date
+        description: Data inicial inclusiva
       - name: end_date
         in: query
-        required: false
+        required: true
         schema:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
+          type: string
+          format: date
+          description: Data final inclusiva; máximo de 31 dias
           title: End Date
+        description: Data final inclusiva; máximo de 31 dias
       - name: limit
         in: query
         required: false
@@ -688,6 +690,7 @@ paths:
         required: false
         schema:
           type: integer
+          maximum: 10000
           minimum: 0
           default: 0
           title: Offset
@@ -717,22 +720,22 @@ paths:
       parameters:
       - name: start_date
         in: query
-        required: false
+        required: true
         schema:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
+          type: string
+          format: date
+          description: Data inicial inclusiva
           title: Start Date
+        description: Data inicial inclusiva
       - name: end_date
         in: query
-        required: false
+        required: true
         schema:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
+          type: string
+          format: date
+          description: Data final inclusiva; máximo de 31 dias
           title: End Date
+        description: Data final inclusiva; máximo de 31 dias
       - name: limit
         in: query
         required: false
@@ -747,6 +750,7 @@ paths:
         required: false
         schema:
           type: integer
+          maximum: 10000
           minimum: 0
           default: 0
           title: Offset

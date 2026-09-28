@@ -1,6 +1,6 @@
 import logging
 import secrets
-from datetime import date
+from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
@@ -26,6 +26,7 @@ HOTSPOT_TABLE = "dbo.spro_flows_hotspotaccess"
 PARKING_ACCESS_TABLE = "dbo.spro_flows_parkingaccess"
 PARKING_PLACES_TABLE = "dbo.spro_flows_parkingplaces"
 PEOPLE_TABLE = "dbo.spro_flows_peopleaccess"
+MAX_QUERY_PERIOD = timedelta(days=30)
 
 
 def _rows_as_dicts(cursor):
@@ -34,20 +35,22 @@ def _rows_as_dicts(cursor):
 
 
 def _date_where(column: str, start_date: date | None, end_date: date | None):
-    if start_date is not None and end_date is not None and start_date > end_date:
+    if start_date is None or end_date is None:
+        raise HTTPException(
+            status_code=422,
+            detail="start_date and end_date are required",
+        )
+    if start_date > end_date:
         raise HTTPException(
             status_code=422,
             detail="start_date must be less than or equal to end_date",
         )
-    clauses = []
-    params = []
-    if start_date is not None:
-        clauses.append(f"{column} >= ?")
-        params.append(start_date)
-    if end_date is not None:
-        clauses.append(f"{column} <= ?")
-        params.append(end_date)
-    return (" WHERE " + " AND ".join(clauses) if clauses else ""), params
+    if end_date - start_date > MAX_QUERY_PERIOD:
+        raise HTTPException(
+            status_code=422,
+            detail="date range cannot exceed 31 days",
+        )
+    return f" WHERE {column} >= ? AND {column} <= ?", [start_date, end_date]
 
 
 def _query_page(sql: str, params: list, limit: int, offset: int):
@@ -84,10 +87,10 @@ def _page(items, limit: int, offset: int):
     ),
 )
 def list_hotspot_access(
-    start_date: date | None = Query(None),
-    end_date: date | None = Query(None),
+    start_date: date = Query(..., description="Data inicial inclusiva"),
+    end_date: date = Query(..., description="Data final inclusiva; máximo de 31 dias"),
     limit: int = Query(100, ge=1, le=500),
-    offset: int = Query(0, ge=0),
+    offset: int = Query(0, ge=0, le=10000),
 ):
     where, params = _date_where("dt_acesso", start_date, end_date)
     sql = f"""
@@ -115,8 +118,8 @@ def list_hotspot_access(
     ),
 )
 def list_parking_places(
-    limit: int = Query(100, ge=1, le=500),
-    offset: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=100),
+    offset: int = Query(0, ge=0, le=1000),
 ):
     sql = f"""
         SELECT equipamento, lugar, tipo
@@ -149,10 +152,10 @@ def _parking_place(row: dict, prefix: str):
     ),
 )
 def list_parking_access(
-    start_date: date | None = Query(None),
-    end_date: date | None = Query(None),
+    start_date: date = Query(..., description="Data inicial inclusiva"),
+    end_date: date = Query(..., description="Data final inclusiva; máximo de 31 dias"),
     limit: int = Query(100, ge=1, le=500),
-    offset: int = Query(0, ge=0),
+    offset: int = Query(0, ge=0, le=10000),
 ):
     where, params = _date_where("pa.dt_entrada", start_date, end_date)
     sql = f"""
@@ -201,10 +204,10 @@ def list_parking_access(
     ),
 )
 def list_people_access(
-    start_date: date | None = Query(None),
-    end_date: date | None = Query(None),
+    start_date: date = Query(..., description="Data inicial inclusiva"),
+    end_date: date = Query(..., description="Data final inclusiva; máximo de 31 dias"),
     limit: int = Query(100, ge=1, le=500),
-    offset: int = Query(0, ge=0),
+    offset: int = Query(0, ge=0, le=10000),
 ):
     where, params = _date_where("dt_acesso", start_date, end_date)
     sql = f"""

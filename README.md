@@ -289,8 +289,10 @@ Example response:
 ### Shopping flows
 
 The Shopping read endpoints expose the four `spro_flows_*` datasets. They are
-protected by bearer authentication, return at most 500 rows per request, and
-use `limit` and `offset` for pagination.
+protected by bearer authentication and use bounded `limit` and `offset`
+pagination. Event endpoints require both `start_date` and `end_date`, with an
+inclusive period limited to 31 days. `parking-places` is a small reference
+dataset and does not require a date range.
 
 | Nome | Endpoint | Descrição |
 | --- | --- | --- |
