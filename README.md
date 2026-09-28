@@ -1,428 +1,914 @@
-# CECILia API <img src="https://snipboard.io/rlh6gz.jpg" width="10%" align="right" valign="middle" alt="CECILia logo"/>
+\# CECILia API \<img *src*="https\://snipboard.io/rlh6gz.jpg" *width*="10%" *align*="right" *valign*="middle" *alt*="CECILia logo"/>
+
+
 
 Service API from Sinal Business
 
-<div align="center">
 
-![version](https://img.shields.io/badge/version-2.0.0-red.svg)
-![status](https://img.shields.io/badge/status-stable-006400.svg)
-![python](https://img.shields.io/badge/Python-3.10-3776AB.svg?logo=python&logoColor=white)
-![fastapi](https://img.shields.io/badge/FastAPI-API-009688.svg?logo=fastapi&logoColor=white)
-![docker](https://img.shields.io/badge/Docker-ready-2496ED.svg?logo=docker&logoColor=white)
-[![docs](https://img.shields.io/badge/docs-ReDoc-85EA2D.svg)](https://chat-gdatabot.onrender.com/docs)
-![security](https://img.shields.io/badge/security-Bearer_token-important.svg)
 
-</div>
+\<div *align*="center">
 
-<details>
-  <summary><strong>[Open/Close] Table of Contents</strong></summary>
 
-- [CECILia API ](#cecilia-api-)
-  - [✨ About](#-about)
-  - [🧰 Technology](#-technology)
-  - [🏗️ Architecture](#️-architecture)
-  - [🚀 Getting Started](#-getting-started)
-    - [Requirements](#requirements)
-    - [Local installation](#local-installation)
-  - [🔐 Authentication](#-authentication)
-  - [📡 Endpoints](#-endpoints)
-    - [Service status](#service-status)
-    - [Validate CPF or CNPJ](#validate-cpf-or-cnpj)
-    - [Atualizar Cobrança de Cliente](#atualizar-cobrança-de-cliente)
-    - [Chatbots](#chatbots)
-  - [🐳 Docker](#-docker)
-  - [⚙️ Environment Variables](#️-environment-variables)
-  - [☁️ Render Deployment](#️-render-deployment)
-  - [📁 Project Structure](#-project-structure)
-  - [🛡️ Security](#️-security)
+
+![version]\(https\://img.shields.io/badge/version-2.0.0-red.svg)
+
+![status]\(https\://img.shields.io/badge/status-stable-006400.svg)
+
+![python]\(https\://img.shields.io/badge/Python-3.10-3776AB.svg?logo=python&logoColor=white)
+
+![fastapi]\(https\://img.shields.io/badge/FastAPI-API-009688.svg?logo=fastapi&logoColor=white)
+
+![docker]\(https\://img.shields.io/badge/Docker-ready-2496ED.svg?logo=docker&logoColor=white)
+
+[![docs]\(https\://img.shields.io/badge/docs-ReDoc-85EA2D.svg)]\(https\://chat-gdatabot.onrender.com/docs)
+
+![security]\(https\://img.shields.io/badge/security-Bearer_token-important.svg)
+
+
+
+\</div>
+
+
+
+\<details>
+
+  \<summary>\<strong>[Open/Close] Table of Contents\</strong>\</summary>
+
+
+
+\- [CECILia API ]\(#cecilia-api-)
+
+  - [✨ About]\(#-about)
+
+  - [🧰 Technology]\(#-technology)
+
+  - [🏗️ Architecture]\(#️-architecture)
+
+  - [🚀 Getting Started]\(#-getting-started)
+
+    - [Requirements]\(#requirements)
+
+    - [Local installation]\(#local-installation)
+
+  - [🔐 Authentication]\(#-authentication)
+
+  - [📡 Endpoints]\(#-endpoints)
+
+    - [Service status]\(#service-status)
+
+    - [Validate CPF or CNPJ]\(#validate-cpf-or-cnpj)
+
+    - [Atualizar Cobrança de Cliente]\(#atualizar-cobrança-de-cliente)
+
+    - [Chatbots]\(#chatbots)
+
+  - [🐳 Docker]\(#-docker)
+
+  - [⚙️ Environment Variables]\(#️-environment-variables)
+
+  - [☁️ Render Deployment]\(#️-render-deployment)
+
+  - [📁 Project Structure]\(#-project-structure)
+
+  - [🛡️ Security]\(#️-security)
+
+
+
+\</details>
+
+
+
+\---
+
+
+
+\## ✨ About
+
+
+
+The CECILia API is a FastAPI service used by the CECILia ecosystem. Version \`2.0.0\` currently provides:
+
+
+
+\- CPF validation, including format, length, repeated digits, and check digits.
+
+\- Numeric and alphanumeric CNPJ validation, including check digits.
+
+\- Bearer token authentication for protected routes.
+
+\- ReDoc and OpenAPI documentation.
+
+\- SQL Server connection support for data-backed services.
+
+\- Sinal Financeiro endpoint for Kanban charge updates.
+
+\- Chatbot application endpoints for registering attendance events.
+
+\- Containerized execution with Docker and Docker Compose.
+
+
+
+\## 🧰 Technology
+
+
+
+\| Technology | Purpose |
+
+\| --- | --- |
+
+\| Python 3.10 | Application runtime |
+
+\| FastAPI | HTTP API framework |
+
+\| Pydantic | Request and response validation |
+
+\| Uvicorn | ASGI server |
+
+\| PyODBC | SQL Server connectivity |
+
+\| Docker | Containerized deployment |
+
+\| OpenAPI / ReDoc | Interactive API documentation |
+
+
+
+\## 🏗️ Architecture
+
+
+
+\`\`\`text
+
+Client
+
+  |
+
+  | Authorization: Bearer \<TOKEN>
+
+  v
+
+FastAPI
+
+  |
+
+  +-- Routers
+
+  |     +-- Health and documentation
+
+  |     +-- Document validation
+
+  |     +-- Sinal Financeiro Kanban updates
+
+  |     +-- Chatbot attendance event registration
+
+  |
+
+  +-- Services
+
+  |     +-- CPF and CNPJ validation rules
+
+  |
+
+  +-- Core
+
+        +-- Authentication
+
+        +-- SQL Server connection
+
+\`\`\`
+
+
+
+\## 🗺️ API Flow
+
+<details open>
+  <summary><strong>[Open/Close] CECILia API endpoint map</strong></summary>
+
+```mermaid
+flowchart LR
+    REPO["🔗 sinalbusiness-cecilia-api"] --> DOCKER["🐳 Docker Web Service"]
+    DOCKER --> API["🛠️ CECILia API"]
+    API --> ENDPOINTS["📡 Endpoints"]
+
+    ENDPOINTS --> GENERAL["📁 General"]
+    ENDPOINTS --> SINAL["📁 Sinal"]
+    ENDPOINTS --> CHATBOTS["📁 Chatbots"]
+    ENDPOINTS --> HEALTH["📁 Health"]
+
+    GENERAL --> VALID_DOC["🌐 Validar Documento<br/>POST /general/operation/validarDocumento"]
+    GENERAL --> VALID_NAME["🌐 Validar Nome<br/>POST /general/operation/validarNome"]
+
+    SINAL --> CLIENT_CHARGE["🌐 Atualizar Cobrança de Cliente<br/>PATCH /sinal/operation/atualizarCobrancaCliente"]
+
+    CHATBOTS --> ATEND["🌐 Registrar Atendimento<br/>POST /chatbots/operation/registrarAtendimento"]
+    CHATBOTS --> CONTATO_I["🌐 Registrar Contato Inicial<br/>POST /chatbots/operation/registrarContatoInicial"]
+    CHATBOTS --> INTERACAO["🌐 Registrar Interação<br/>POST /chatbots/operation/registrarInteracao"]
+    CHATBOTS --> AVALIACAO["🌐 Registrar Avaliação de Atendimento<br/>POST /chatbots/operation/registrarAvaliacaoAtendimento"]
+    CHATBOTS --> HUMANO["🌐 Registrar Atendimento Humano<br/>POST /chatbots/operation/registrarAtendimentoHumano"]
+    CHATBOTS --> CONTATO_F["🌐 Registrar Contato Final<br/>POST /chatbots/operation/registrarContatoFinal"]
+    CHATBOTS --> SERVICO["🌐 Registrar Serviço<br/>POST /chatbots/operation/registrarServico"]
+
+    HEALTH --> CHECK_DB["🌐 Checar Banco de Dados<br/>GET /health/operation/checarBancoDados"]
+
+    click REPO "https://github.com/Sinal-Business/cecilia-api" "Open repository" _blank
+    click DOCKER "#-render-deployment" "Open deployment docs"
+    click API "#cecilia-api-" "Back to top"
+    click ENDPOINTS "#-endpoints" "Open endpoint docs"
+    click GENERAL "#validate-cpf-or-cnpj" "Open general validation docs"
+    click SINAL "#atualizar-cobrança-de-cliente" "Open Sinal endpoint docs"
+    click CHATBOTS "#chatbots" "Open chatbot endpoint docs"
+    click HEALTH "#service-status" "Open health/service docs"
+
+    click VALID_DOC "https://sinalbusiness-cecilia-api.onrender.com/docs" "Open API docs" _blank
+    click VALID_NAME "https://sinalbusiness-cecilia-api.onrender.com/docs" "Open API docs" _blank
+    click CLIENT_CHARGE "https://sinalbusiness-cecilia-api.onrender.com/docs" "Open API docs" _blank
+    click ATEND "https://sinalbusiness-cecilia-api.onrender.com/docs" "Open API docs" _blank
+    click CONTATO_I "https://sinalbusiness-cecilia-api.onrender.com/docs" "Open API docs" _blank
+    click INTERACAO "https://sinalbusiness-cecilia-api.onrender.com/docs" "Open API docs" _blank
+    click AVALIACAO "https://sinalbusiness-cecilia-api.onrender.com/docs" "Open API docs" _blank
+    click HUMANO "https://sinalbusiness-cecilia-api.onrender.com/docs" "Open API docs" _blank
+    click CONTATO_F "https://sinalbusiness-cecilia-api.onrender.com/docs" "Open API docs" _blank
+    click SERVICO "https://sinalbusiness-cecilia-api.onrender.com/docs" "Open API docs" _blank
+    click CHECK_DB "https://sinalbusiness-cecilia-api.onrender.com/docs" "Open API docs" _blank
+```
+
+> The endpoint map mirrors the operational grouping shown in the project flow. Click section nodes for internal README navigation and endpoint nodes for the deployed API documentation.
 
 </details>
 
 ---
 
-## ✨ About
-
-The CECILia API is a FastAPI service used by the CECILia ecosystem. Version `2.0.0` currently provides:
-
-- CPF validation, including format, length, repeated digits, and check digits.
-- Numeric and alphanumeric CNPJ validation, including check digits.
-- Bearer token authentication for protected routes.
-- ReDoc and OpenAPI documentation.
-- SQL Server connection support for data-backed services.
-- Sinal Financeiro endpoint for Kanban charge updates.
-- Chatbot application endpoints for registering attendance events.
-- Containerized execution with Docker and Docker Compose.
-
-## 🧰 Technology
-
-| Technology | Purpose |
-| --- | --- |
-| Python 3.10 | Application runtime |
-| FastAPI | HTTP API framework |
-| Pydantic | Request and response validation |
-| Uvicorn | ASGI server |
-| PyODBC | SQL Server connectivity |
-| Docker | Containerized deployment |
-| OpenAPI / ReDoc | Interactive API documentation |
-
-## 🏗️ Architecture
-
-```text
-Client
-  |
-  | Authorization: Bearer <TOKEN>
-  v
-FastAPI
-  |
-  +-- Routers
-  |     +-- Health and documentation
-  |     +-- Document validation
-  |     +-- Sinal Financeiro Kanban updates
-  |     +-- Chatbot attendance event registration
-  |
-  +-- Services
-  |     +-- CPF and CNPJ validation rules
-  |
-  +-- Core
-        +-- Authentication
-        +-- SQL Server connection
-```
-
 ## 🚀 Getting Started
 
-### Requirements
 
-- Python `3.10+`
-- ODBC Driver for SQL Server when database access is used
-- Docker and Docker Compose, optionally
 
-### Local installation
+\### Requirements
 
-```bash
-git clone https://github.com/Sinal-Business/cecilia-api.git
+
+
+\- Python \`3.10+\`
+
+\- ODBC Driver for SQL Server when database access is used
+
+\- Docker and Docker Compose, optionally
+
+
+
+\### Local installation
+
+
+
+\`\`\`bash
+
+git clone https\://github.com/Sinal-Business/cecilia-api.git
+
 cd cecilia-api
 
+
+
 python -m venv .venv
-```
+
+\`\`\`
+
+
 
 Activate the virtual environment:
 
-```powershell
-# Windows
-.\.venv\Scripts\Activate.ps1
-```
 
-```bash
-# Linux or macOS
+
+\`\`\`powershell
+
+*# Windows*
+
+.\\.venv\Scripts\Activate.ps1
+
+\`\`\`
+
+
+
+\`\`\`bash
+
+*# Linux or macOS*
+
 source .venv/bin/activate
-```
+
+\`\`\`
+
+
 
 Install and run:
 
-```bash
+
+
+\`\`\`bash
+
 pip install -r requirements.txt
+
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
+
+\`\`\`
+
+
 
 The local service will be available at:
 
-- API: `http://localhost:8000`
-- ReDoc: `http://localhost:8000/docs`
-- OpenAPI JSON: `http://localhost:8000/openapi.json`
-- OpenAPI YAML: `http://localhost:8000/openapi.yaml`
 
-## 🔐 Authentication
 
-Protected routes require a bearer token configured in `TOKEN` or the optional
-`TOKEN_SECONDARY` environment variable. This supports token rotation or a
+\- API: \`http\://localhost:8000\`
+
+\- ReDoc: \`http\://localhost:8000/docs\`
+
+\- OpenAPI JSON: \`http\://localhost:8000/openapi.json\`
+
+\- OpenAPI YAML: \`http\://localhost:8000/openapi.yaml\`
+
+
+
+\## 🔐 Authentication
+
+
+
+Protected routes require a bearer token configured in \`TOKEN\` or the optional
+
+\`TOKEN_SECONDARY\` environment variable. This supports token rotation or a
+
 separate integration token without interrupting existing callers.
 
-```http
-Authorization: Bearer <TOKEN>
+
+
+\`\`\`http
+
+Authorization: Bearer \<TOKEN>
+
 Content-Type: application/json
-```
+
+\`\`\`
+
+
 
 Never commit tokens, passwords, connection strings, or local environment files.
 
-## 📡 Endpoints
 
-### Service status
 
-```http
+\## 📡 Endpoints
+
+
+
+\### Service status
+
+
+
+\`\`\`http
+
 GET /
-```
+
+\`\`\`
+
+
 
 Example response:
 
-```json
+
+
+\`\`\`json
+
 {
-  "status": "API on air"
+
+  "status": "API on air"
+
 }
-```
 
-### Validate CPF or CNPJ
+\`\`\`
 
-```http
+
+
+\### Validate CPF or CNPJ
+
+
+
+\`\`\`http
+
 POST /validations/document
-Authorization: Bearer <TOKEN>
+
+Authorization: Bearer \<TOKEN>
+
 Content-Type: application/json
-```
+
+\`\`\`
+
+
 
 CPF request:
 
-```json
+
+
+\`\`\`json
+
 {
-  "tipo": "cpf",
-  "valor": "12345678909"
+
+  "tipo": "cpf",
+
+  "valor": "12345678909"
+
 }
-```
+
+\`\`\`
+
+
 
 CNPJ request:
 
-```json
+
+
+\`\`\`json
+
 {
-  "tipo": "cnpj",
-  "valor": "12345678000195"
+
+  "tipo": "cnpj",
+
+  "valor": "12345678000195"
+
 }
-```
+
+\`\`\`
+
+
 
 Response format:
 
-```json
+
+
+\`\`\`json
+
 {
-  "valid_doc": true,
-  "status": "CPF_VALID",
-  "notes": "Obrigada 😊"
+
+  "valid_doc": true,
+
+  "status": "CPF_VALID",
+
+  "notes": "Obrigada 😊"
+
 }
-```
+
+\`\`\`
+
+
 
 Possible status values:
 
-| Document | Status |
-| --- | --- |
-| CPF | `CPF_VALID` |
-| CPF | `CPF_INVALID_EMPTY` |
-| CPF | `CPF_INVALID_FORMAT` |
-| CPF | `CPF_INVALID_LENGTH` |
-| CPF | `CPF_INVALID_DIGITS` |
-| CNPJ | `CNPJ_VALID` |
-| CNPJ | `CNPJ_INVALID_EMPTY` |
-| CNPJ | `CNPJ_INVALID_FORMAT` |
-| CNPJ | `CNPJ_INVALID_LENGTH` |
-| CNPJ | `CNPJ_INVALID_DIGITS` |
-| General | `DOCUMENT_INVALID_TYPE` |
 
-### Atualizar Cobrança de Cliente
 
-```http
+\| Document | Status |
+
+\| --- | --- |
+
+\| CPF | \`CPF_VALID\` |
+
+\| CPF | \`CPF_INVALID_EMPTY\` |
+
+\| CPF | \`CPF_INVALID_FORMAT\` |
+
+\| CPF | \`CPF_INVALID_LENGTH\` |
+
+\| CPF | \`CPF_INVALID_DIGITS\` |
+
+\| CNPJ | \`CNPJ_VALID\` |
+
+\| CNPJ | \`CNPJ_INVALID_EMPTY\` |
+
+\| CNPJ | \`CNPJ_INVALID_FORMAT\` |
+
+\| CNPJ | \`CNPJ_INVALID_LENGTH\` |
+
+\| CNPJ | \`CNPJ_INVALID_DIGITS\` |
+
+\| General | \`DOCUMENT_INVALID_TYPE\` |
+
+
+
+\### Atualizar Cobrança de Cliente
+
+
+
+\`\`\`http
+
 PATCH /adm/client-charge
-Authorization: Bearer <TOKEN>
+
+Authorization: Bearer \<TOKEN>
+
 Content-Type: application/json
-```
+
+\`\`\`
+
+
 
 Request:
 
-```json
+
+
+\`\`\`json
+
 {
-  "contato": "+5521999999999",
-  "status": "Atual (Com Projeção)",
-  "resposta": "Cliente informou previsão de pagamento.",
-  "dt_projecao_pgto": "2026-06-30"
+
+  "contato": "+5521999999999",
+
+  "status": "Atual (Com Projeção)",
+
+  "resposta": "Cliente informou previsão de pagamento.",
+
+  "dt_projecao_pgto": "2026-06-30"
+
 }
-```
+
+\`\`\`
+
+
 
 The endpoint updates the customer charge fields used by the Financeiro Kanban
-module. It locates the customer by `contato` and only changes `status`,
-`resposta`, and `dt_projecao_pgto`. `status` is required; `resposta` and
-`dt_projecao_pgto` are optional. The received `contato` may include `+`,
+
+module. It locates the customer by \`contato\` and only changes \`status\`,
+
+\`resposta\`, and \`dt_projecao_pgto\`. \`status\` is required; \`resposta\` and
+
+\`dt_projecao_pgto\` are optional. The received \`contato\` may include \`+\`,
+
 spaces, hyphens, or parentheses; the application normalizes it to digits before
-matching. `dt_cobranca` is filled automatically by the application with the
+
+matching. \`dt_cobranca\` is filled automatically by the application with the
+
 current São Paulo date and time whenever the update is processed.
+
+
 
 Response:
 
-```json
-{
-  "ok": true,
-  "updated_count": 1,
-  "contato": "5521999999999"
-}
-```
 
-### Chatbots
+
+\`\`\`json
+
+{
+
+  "ok": true,
+
+  "updated_count": 1,
+
+  "contato": "5521999999999"
+
+}
+
+\`\`\`
+
+
+
+\### Chatbots
+
+
 
 All Chatbots endpoints are protected by the same bearer token and accept
-`POST` requests with JSON payloads from the chatbot application. The `bot`
-field is required, `contato` is accepted for the customer contact, and
-`dt_interacao` is filled automatically by the API.
 
-| Endpoint | Purpose |
-| --- | --- |
-| `POST /chatbots/registrarAtendimento` | Registrar Atendimento |
-| `POST /chatbots/registrarContatoInicial` | Registrar Contato Inicial |
-| `POST /chatbots/registrarInteracao` | Registrar Interação |
-| `POST /chatbots/registrarAvaliacaoAtendimento` | Registrar Avaliação de Atendimento |
-| `POST /chatbots/registrarAtendimentoHumano` | Registrar Atendimento Humano |
-| `POST /chatbots/registrarContatoFinal` | Registrar Contato Final |
-| `POST /chatbots/registrarServico` | Registrar Serviço |
+\`POST\` requests with JSON payloads from the chatbot application. The \`bot\`
+
+field is required, \`contato\` is accepted for the customer contact, and
+
+\`dt_interacao\` is filled automatically by the API.
+
+
+
+\| Endpoint | Purpose |
+
+\| --- | --- |
+
+\| \`POST /chatbots/registrarAtendimento\` | Registrar Atendimento |
+
+\| \`POST /chatbots/registrarContatoInicial\` | Registrar Contato Inicial |
+
+\| \`POST /chatbots/registrarInteracao\` | Registrar Interação |
+
+\| \`POST /chatbots/registrarAvaliacaoAtendimento\` | Registrar Avaliação de Atendimento |
+
+\| \`POST /chatbots/registrarAtendimentoHumano\` | Registrar Atendimento Humano |
+
+\| \`POST /chatbots/registrarContatoFinal\` | Registrar Contato Final |
+
+\| \`POST /chatbots/registrarServico\` | Registrar Serviço |
+
+
 
 Example request:
 
-```json
+
+
+\`\`\`json
+
 {
-  "id_cliente": "10346316758",
-  "contato": "+5521999999999",
-  "bot": "Cecilia"
+
+  "id_cliente": "10346316758",
+
+  "contato": "+5521999999999",
+
+  "bot": "Cecilia"
+
 }
-```
+
+\`\`\`
+
+
 
 Example response:
 
-```json
+
+
+\`\`\`json
+
 {
-  "ok": true,
-  "inserted_count": 1,
-  "event": "Registrar Atendimento"
+
+  "ok": true,
+
+  "inserted_count": 1,
+
+  "event": "Registrar Atendimento"
+
 }
-```
 
-### Shopping flows
+\`\`\`
 
-The Shopping read endpoints expose the four `spro_flows_*` datasets. They are
-protected by bearer authentication and use bounded `limit` and `offset`
-pagination. Event endpoints require both `start_date` and `end_date`, with an
-inclusive period limited to 31 days. `parking-places` is a small reference
+
+
+\### Shopping flows
+
+
+
+The Shopping read endpoints expose the four \`spro_flows\_\*\` datasets. They are
+
+protected by bearer authentication and use bounded \`limit\` and \`offset\`
+
+pagination. Event endpoints require both \`start_date\` and \`end_date\`, with an
+
+inclusive period limited to 31 days. \`parking-places\` is a small reference
+
 dataset and does not require a date range.
 
-| Nome | Endpoint | Descrição |
-| --- | --- | --- |
-| Acessos Hotspot de Wi-Fi | `GET /shopping/flows/hotspot-access` | Registros de acesso com data, localização aproximada e perfil de acesso. |
-| Acessos Estacionamento | `GET /shopping/flows/parking-access` | Movimentações de entrada, saída, permanência e pagamento. |
-| Locais Estacionamento | `GET /shopping/flows/parking-places` | Locais e tipos associados aos pontos de operação do estacionamento. |
-| Acessos de Pessoas | `GET /shopping/flows/people-access` | Fluxo de pessoas por data e ponto de entrada, com informações contextuais. |
+
+
+\| Nome | Endpoint | Descrição |
+
+\| --- | --- | --- |
+
+\| Acessos Hotspot de Wi-Fi | \`GET /shopping/flows/hotspot-access\` | Registros de acesso com data, localização aproximada e perfil de acesso. |
+
+\| Acessos Estacionamento | \`GET /shopping/flows/parking-access\` | Movimentações de entrada, saída, permanência e pagamento. |
+
+\| Locais Estacionamento | \`GET /shopping/flows/parking-places\` | Locais e tipos associados aos pontos de operação do estacionamento. |
+
+\| Acessos de Pessoas | \`GET /shopping/flows/people-access\` | Fluxo de pessoas por data e ponto de entrada, com informações contextuais. |
+
+
 
 Example:
 
-```http
-GET /shopping/flows/parking-access?start_date=2026-09-01&end_date=2026-09-30&limit=100&offset=0
-Authorization: Bearer <TOKEN>
-```
 
-`parking-access` resolves `eq_entrada`, `eq_saida`, `eq_pagamento`, and
-`eq_voucher` against `parkingplaces.equipamento`. The response retains each
-raw equipment code and, when a reference exists, adds `entrada_local`,
-`saida_local`, `pagamento_local`, or `voucher_local` with the equipment,
+
+\`\`\`http
+
+GET /shopping/flows/parking-access?start_date=2026-09-01&end_date=2026-09-30&limit=100&offset=0
+
+Authorization: Bearer \<TOKEN>
+
+\`\`\`
+
+
+
+\`parking-access\` resolves \`eq_entrada\`, \`eq_saida\`, \`eq_pagamento\`, and
+
+\`eq_voucher\` against \`parkingplaces.equipamento\`. The response retains each
+
+raw equipment code and, when a reference exists, adds \`entrada_local\`,
+
+\`saida_local\`, \`pagamento_local\`, or \`voucher_local\` with the equipment,
+
 place, and type. This is a left-join relationship, so an access row is not
-discarded when its equipment has not yet been registered in `parkingplaces`.
+
+discarded when its equipment has not yet been registered in \`parkingplaces\`.
+
+
 
 Hotspot CPF and parking vehicle plate fields are confidential. Clients must
+
 request only the necessary period and avoid logging or redistributing them.
 
-### Shopping sales
 
-`GET /shopping/finance/sales` exposes `spro_financeiro_vendas` with bearer
+
+\### Shopping sales
+
+
+
+\`GET /shopping/finance/sales\` exposes \`spro_financeiro_vendas\` with bearer
+
 authentication, bounded pagination, and a mandatory inclusive date range of at
-most 31 days. Exact filters are available for `loja`, `luc`, `categoria`,
-`segmento`, and `classificacao`.
 
-The endpoint defaults to `month_end_only=true`. Historical records can be
+most 31 days. Exact filters are available for \`loja\`, \`luc\`, \`categoria\`,
+
+\`segmento\`, and \`classificacao\`.
+
+
+
+The endpoint defaults to \`month_end_only=true\`. Historical records can be
+
 cumulative daily snapshots, so summing every date in a month would overstate
-sales. Use `month_end_only=false` only to inspect the daily cumulative series.
 
-```http
+sales. Use \`month_end_only=false\` only to inspect the daily cumulative series.
+
+
+
+\`\`\`http
+
 GET /shopping/finance/sales?start_date=2026-08-01&end_date=2026-08-31&month_end_only=true&limit=100&offset=0
-Authorization: Bearer <TOKEN>
-```
 
-## 🐳 Docker
+Authorization: Bearer \<TOKEN>
 
-Create a local `.env` file with the required variables, then run:
+\`\`\`
 
-```bash
+
+
+\## 🐳 Docker
+
+
+
+Create a local \`.env\` file with the required variables, then run:
+
+
+
+\`\`\`bash
+
 docker compose up --build
-```
 
-The API will be exposed at `http://localhost:8000`.
+\`\`\`
+
+
+
+The API will be exposed at \`http\://localhost:8000\`.
+
+
 
 To stop the service:
 
-```bash
+
+
+\`\`\`bash
+
 docker compose down
-```
 
-## ⚙️ Environment Variables
+\`\`\`
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `TOKEN` | Yes | Primary bearer token accepted by protected endpoints |
-| `TOKEN_SECONDARY` | No | Optional second active bearer token for a separate integration or rotation window |
-| `DATABASE_URL` | For database access | Full SQL Server ODBC connection string; preferred for Render |
-| `SQL_SERVER_HOST` | Fallback database access | SQL Server hostname when `DATABASE_URL` is not set |
-| `SQL_SERVER_DB` | Fallback database access | Database name when `DATABASE_URL` is not set |
-| `SQL_SERVER_USER` | Fallback database access | Database user when `DATABASE_URL` is not set |
-| `SQL_SERVER_PASSWORD` | Fallback database access | Database password when `DATABASE_URL` is not set |
-| `PORT` | No | HTTP port used by the container; defaults to `8000` |
+
+
+\## ⚙️ Environment Variables
+
+
+
+\| Variable | Required | Description |
+
+\| --- | --- | --- |
+
+\| \`TOKEN\` | Yes | Primary bearer token accepted by protected endpoints |
+
+\| \`TOKEN_SECONDARY\` | No | Optional second active bearer token for a separate integration or rotation window |
+
+\| \`DATABASE_URL\` | For database access | Full SQL Server ODBC connection string; preferred for Render |
+
+\| \`SQL_SERVER_HOST\` | Fallback database access | SQL Server hostname when \`DATABASE_URL\` is not set |
+
+\| \`SQL_SERVER_DB\` | Fallback database access | Database name when \`DATABASE_URL\` is not set |
+
+\| \`SQL_SERVER_USER\` | Fallback database access | Database user when \`DATABASE_URL\` is not set |
+
+\| \`SQL_SERVER_PASSWORD\` | Fallback database access | Database password when \`DATABASE_URL\` is not set |
+
+\| \`PORT\` | No | HTTP port used by the container; defaults to \`8000\` |
+
+
 
 Example with placeholders only:
 
-```dotenv
-TOKEN=replace-with-a-strong-random-token
-TOKEN_SECONDARY=optional-second-strong-random-token
-DATABASE_URL=Driver={ODBC Driver 18 for SQL Server};Server=tcp:your-server.database.windows.net,1433;Database=your-database;Uid=your-user;Pwd=your-password;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;
-SQL_SERVER_HOST=your-server
-SQL_SERVER_DB=your-database
-SQL_SERVER_USER=your-user
-SQL_SERVER_PASSWORD=your-password
-PORT=8000
-```
 
-## ☁️ Render Deployment
+
+\`\`\`dotenv
+
+TOKEN=replace-with-a-strong-random-token
+
+TOKEN_SECONDARY=optional-second-strong-random-token
+
+DATABASE_URL=Driver={ODBC Driver 18 for SQL Server};Server=tcp:your-server.database.windows.net,1433;Database=your-database;Uid=your-user;Pwd=your-password;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;
+
+SQL_SERVER_HOST=your-server
+
+SQL_SERVER_DB=your-database
+
+SQL_SERVER_USER=your-user
+
+SQL_SERVER_PASSWORD=your-password
+
+PORT=8000
+
+\`\`\`
+
+
+
+\## ☁️ Render Deployment
+
+
 
 Deploy this service as a Docker Web Service, not as the native Python runtime.
+
 The Docker image installs Microsoft's SQL Server ODBC driver, which is required
-by `pyodbc` when `DATABASE_URL` uses `Driver={ODBC Driver 18 for SQL Server}`.
+
+by \`pyodbc\` when \`DATABASE_URL\` uses \`Driver={ODBC Driver 18 for SQL Server}\`.
+
+
 
 Recommended Render settings:
 
-| Setting | Value |
-| --- | --- |
-| Runtime | Docker |
-| Dockerfile Path | `./dockerfile` |
-| Environment variables | `TOKEN`, optional `TOKEN_SECONDARY`, `DATABASE_URL` |
+
+
+\| Setting | Value |
+
+\| --- | --- |
+
+\| Runtime | Docker |
+
+\| Dockerfile Path | \`./dockerfile\` |
+
+\| Environment variables | \`TOKEN\`, optional \`TOKEN_SECONDARY\`, \`DATABASE_URL\` |
+
+
 
 If the service is deployed as Python instead of Docker, SQL Server routes can
+
 fail with:
 
-```text
+
+
+\`\`\`text
+
 Can't open lib 'ODBC Driver 18 for SQL Server' : file not found
-```
 
-## 📁 Project Structure
+\`\`\`
 
-```text
+
+
+\## 📁 Project Structure
+
+
+
+\`\`\`text
+
 cecilia-api/
-├── core/                 # Authentication and database connection
-├── routers/              # HTTP route definitions
-├── schemas/              # Pydantic request and response models
-├── services/             # Business and validation rules
-├── docker-compose.yml    # Local container orchestration
-├── dockerfile            # Container image definition
-├── main.py               # FastAPI application entry point
-├── openapi.yaml          # OpenAPI contract
-└── requirements.txt      # Python dependencies
-```
 
-## 🛡️ Security
+├── core/                 # Authentication and database connection
 
-- Store production secrets only in the deployment platform's secret manager.
-- Use a long, randomly generated token and rotate it periodically.
-- Do not expose SQL Server directly to the public internet.
-- Restrict database credentials to the minimum required permissions.
-- Review dependency and container image updates before each release.
-- Keep `openapi.yaml` synchronized with the FastAPI-generated contract.
+├── routers/              # HTTP route definitions
 
----
+├── schemas/              # Pydantic request and response models
 
-<div align="center">
-Developed for the <strong>CECILia</strong> ecosystem by Sinal Business
-</div>
+├── services/             # Business and validation rules
+
+├── docker-compose.yml    # Local container orchestration
+
+├── dockerfile            # Container image definition
+
+├── main.py               # FastAPI application entry point
+
+├── openapi.yaml          # OpenAPI contract
+
+└── requirements.txt      # Python dependencies
+
+\`\`\`
+
+
+
+\## 🛡️ Security
+
+
+
+\- Store production secrets only in the deployment platform's secret manager.
+
+\- Use a long, randomly generated token and rotate it periodically.
+
+\- Do not expose SQL Server directly to the public internet.
+
+\- Restrict database credentials to the minimum required permissions.
+
+\- Review dependency and container image updates before each release.
+
+\- Keep \`openapi.yaml\` synchronized with the FastAPI-generated contract.
+
+
+
+\---
+
+
+
+\<div *align*="center">
+
+Developed for the \<strong>CECILia\</strong> ecosystem by Sinal Business
+
+\</div>
