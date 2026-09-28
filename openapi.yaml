@@ -1,700 +1,1717 @@
 openapi: 3.1.0
 info:
-  title: Cecilia API
-  version: "2.0.0"
-
+  title: CECILia API
+  description: "\nAPI de serviços da Sinal Business\n\n### ⚠️ Autenticação:  \n\n\
+    Para utilizar os recursos é necessário se autenticar utilizando o TOKEN com as\
+    \ credenciais fornecidas.  \n\n> Se você não tem esse acesso, contate o time técnico\
+    \ responsável  \n\nAs credenciais devem ser informadas no header `Authorization`\
+    \ da requisição:\n\n```http\nAuthorization: Bearer TOKEN\nContent-Type: application/json\n"
+  version: 2.0.0
 servers:
-  - url: https://chat-gdatabot.onrender.com
-
-security:
-  - BearerAuth: []
-
+- url: https://sinalbusiness-cecilia-api.onrender.com
 paths:
-  /validations/document:
+  /validations/name:
     post:
-      operationId: validateDocument
       tags:
-        - Validações
-      summary: Valida CPF ou CNPJ
-      description: Valida documentos CPF e CNPJ, incluindo formato, quantidade de caracteres e dígitos verificadores.
-      security:
-        - BearerAuth: []
+      - General
+      summary: Validar Nome
+      description: 'Valida e formata um nome recebido por qualquer sistema de origem.
+
+
+        ### Regras aplicadas
+
+        - O valor deve conter entre 2 e 60 caracteres após a remoção de espaços nas
+        extremidades
+
+        - Não pode conter números, CPF, CNPJ, endereço de e-mail ou link
+
+        - Aceita letras, espaços, apóstrofos e hífens
+
+        - Cada palavra deve ter pelo menos 2 caracteres, exceto os conectores `da`,
+        `de`, `do`, `das`, `dos` e `e`
+
+        - Deve conter pelo menos uma palavra de nome além dos conectores aceitos
+
+        - Rejeita palavras relacionadas a solicitações, como boleto, pagamento, contrato,
+        suporte e manutenção
+
+        - Rejeita textos que aparentem ser frases em vez de nomes
+
+
+        ### Tratamento aplicado
+
+        - Remove espaços no início e no final
+
+        - Substitui sequências de espaços por um único espaço
+
+        - Coloca a inicial de cada palavra em maiúscula e as demais letras em minúscula
+
+        - Mantém os conectores aceitos em minúsculas
+
+
+        ### Campos retornados
+
+        - `nome_original`: valor recebido após a remoção de espaços nas extremidades
+
+        - `nome_tratado`: nome com espaços e capitalização padronizados
+
+        - `nome_valido`: booleano que indica o resultado da validação
+
+        - `status_nome`: `VALID_NAME` ou `INVALID_NAME`
+
+        - `motivo_nome_invalido`: motivo da rejeição; vazio quando o nome é válido'
+      operationId: validarNome
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ValidateDocumentRequest"
-            examples:
-              cpf:
-                summary: Validação de CPF
-                value:
-                  tipo: cpf
-                  valor: "12345678909"
-              cnpj:
-                summary: Validação de CNPJ
-                value:
-                  tipo: cnpj
-                  valor: "12345678000195"
+              $ref: '#/components/schemas/ValidateNameInput'
+        required: true
       responses:
-        "200":
+        '200':
+          description: Resultado da validação do nome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateNameResponse'
+              example:
+                nome_original: maria DA silva
+                nome_tratado: Maria da Silva
+                nome_valido: true
+                status_nome: VALID_NAME
+                motivo_nome_invalido: ''
+        '403':
+          description: Token inválido ou ausente
+        '422':
+          description: Payload inválido
+      security:
+      - HTTPBearer: []
+  /validations/document:
+    post:
+      tags:
+      - General
+      summary: Validar Documento
+      description: 'Valida CPF ou CNPJ informado na requisição:
+
+        - `valid_doc`: booleano indicando se o documento é válido.
+
+        - `status`: status técnico da validação.
+
+        - `notes`: mensagem pronta para retorno ao usuário. Retorna `null` quando
+        o documento é válido.
+
+
+        ### Regras aplicadas
+
+        - CPF deve conter apenas números
+
+        - CPF deve ter exatamente 11 dígitos
+
+        - CPF não pode conter pontos, traços, letras, espaços ou caracteres especiais
+
+        - CNPJ deve conter apenas letras e números
+
+        - CNPJ deve ter exatamente 14 caracteres
+
+        - CNPJ aceita formato alfanumérico
+
+        - CNPJ não pode conter pontos, barras, traços, espaços ou caracteres especiais
+
+        - Os dois últimos caracteres do CNPJ devem ser números
+
+        - CPF e CNPJ têm os dígitos verificadores validados
+
+
+        ### Status possíveis
+
+        - `CPF_VALID`
+
+        - `CPF_INVALID_EMPTY`
+
+        - `CPF_INVALID_FORMAT`
+
+        - `CPF_INVALID_LENGTH`
+
+        - `CPF_INVALID_DIGITS`
+
+        - `CNPJ_VALID`
+
+        - `CNPJ_INVALID_EMPTY`
+
+        - `CNPJ_INVALID_FORMAT`
+
+        - `CNPJ_INVALID_LENGTH`
+
+        - `CNPJ_INVALID_DIGITS`
+
+        - `DOCUMENT_INVALID_TYPE`'
+      operationId: validarDocumento
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateDocumentInput'
+              description: Dados para validação do documento. Informe o tipo do documento
+                e o valor recebido pela aplicação de origem
+        required: true
+      responses:
+        '200':
           description: Resultado da validação do documento
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ValidateDocumentResponse"
+                $ref: '#/components/schemas/ValidateDocumentResponse'
               examples:
-                validCpf:
+                cpf_valido:
                   summary: CPF válido
                   value:
-                    ok: true
-                    documento_original: "12345678909"
-                    documento_valido: true
-                    tipo_documento: CPF
-                    status_documento: VALID_CPF
-                    motivo_invalido: ""
-                invalidCpf:
-                  summary: CPF inválido
+                    valid_doc: true
+                    status: CPF_VALID
+                    notes: Obrigada 😊
+                cpf_formato_invalido:
+                  summary: CPF com formato inválido
                   value:
-                    ok: true
-                    documento_original: "123.456.789-09"
-                    documento_valido: false
-                    tipo_documento: CPF
-                    status_documento: INVALID_CPF_FORMAT
-                    motivo_invalido: CPF deve conter apenas números, sem pontos, traços, letras ou espaços
-        "403":
-          description: Token inválido
-        "422":
-          description: Erro de validação do payload
-
+                    valid_doc: false
+                    status: CPF_INVALID_FORMAT
+                    notes: Parece que você enviou um CPF com letras, símbolos ou espaços.
+                      Por favor, me envie apenas os números 😊
+                cpf_quantidade_invalida:
+                  summary: CPF com quantidade inválida
+                  value:
+                    valid_doc: false
+                    status: CPF_INVALID_LENGTH
+                    notes: O CPF precisa ter exatamente 11 dígitos. Você pode por
+                      favor conferir e me mandar novamente? 😊
+                cnpj_valido:
+                  summary: CNPJ válido
+                  value:
+                    valid_doc: true
+                    status: CNPJ_VALID
+                    notes: Obrigada 😊
+                cnpj_formato_invalido:
+                  summary: CNPJ com formato inválido
+                  value:
+                    valid_doc: false
+                    status: CNPJ_INVALID_FORMAT
+                    notes: Parece que você enviou um CNPJ com símbolos, pontuação
+                      ou espaços. Por favor, me envie apenas os dígitos 😊
+                tipo_invalido:
+                  summary: Tipo de documento inválido
+                  value:
+                    valid_doc: false
+                    status: DOCUMENT_INVALID_TYPE
+                    notes: Ocorreu um erro na autenticação, por favor envie falar
+                      com humano no chat 😊
+        '403':
+          description: Token inválido ou ausente
+        '422':
+          description: Payload inválido
+      security:
+      - HTTPBearer: []
   /adm/client-charge:
     patch:
-      operationId: atualizarCobrancaCliente
       tags:
-        - Sinal
+      - Sinal
       summary: Atualizar Cobrança de Cliente
-      description: |
-        Atualiza os campos de cobrança exibidos no módulo Kanban do Financeiro,
-        localizando os registros por contato.
-        O contato pode vir com +, espaços, hífens ou parênteses; a aplicação
+      description: 'Atualiza os campos de cobrança exibidos no módulo Kanban do Financeiro,
+
+        localizando os registros por `contato`.
+
+        O `contato` pode vir com `+`, espaços, hífens ou parênteses; a aplicação
+
         normaliza o valor para somente números antes da busca.
 
+
         Somente os campos abaixo podem ser alterados por este endpoint:
-        - status
-        - resposta
-        - dt_projecao_pgto
-        dt_cobranca é preenchida automaticamente pela aplicação com a data e hora
-        atual de São Paulo sempre que a atualização é processada.
-      security:
-        - BearerAuth: []
+
+        - `status`
+
+        - `resposta`
+
+        - `dt_projecao_pgto`
+
+
+        `dt_cobranca` é preenchida automaticamente pela aplicação com a data e hora
+
+        atual sempre que a atualização é processada.'
+      operationId: atualizarCobrancaCliente
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateClientChargeRequest"
-            examples:
-              botconversa:
-                summary: Atualização enviada pelo BotConversa
-                value:
-                  contato: "+5521999999999"
-                  status: Atual (Com Projeção)
-                  resposta: Cliente informou previsão de pagamento.
-                  dt_projecao_pgto: "2026-06-30"
+              $ref: '#/components/schemas/UpdateClientChargeInput'
+              description: Dados recebidos via webhook para atualizar a cobrança do
+                cliente
+        required: true
       responses:
-        "200":
+        '200':
           description: Cobrança atualizada
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdateClientChargeResponse"
-              examples:
-                updated:
-                  summary: Atualização realizada
-                  value:
-                    ok: true
-                    updated_count: 1
-                    contato: "5521999999999"
-        "400":
+                $ref: '#/components/schemas/UpdateClientChargeResponse'
+        '400':
           description: Nenhum campo de cobrança informado
-        "403":
+        '403':
           description: Token inválido ou ausente
-        "404":
+        '404':
           description: Nenhuma cobrança encontrada para o filtro informado
-        "422":
-          description: Erro de validação do payload
-        "503":
+        '422':
+          description: Payload inválido
+        '503':
           description: Falha ao atualizar a cobrança
-
+      security:
+      - HTTPBearer: []
   /chatbots/registrarAtendimento:
     post:
-      operationId: registrarAtendimento
       tags:
-        - Chatbots
+      - Chatbots
       summary: Registrar Atendimento
       description: Registra o início do atendimento pela aplicação de chatbot.
-      security:
-        - BearerAuth: []
+      operationId: registrarAtendimento
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegistrarAtendimentoRequest"
-            examples:
-              atendimento:
-                summary: Atendimento iniciado
-                value:
-                  id_cliente: "12345"
-                  contato: "+5521999999999"
-                  tags: NomeCadastrado
-                  bot: Cecilia
+              $ref: '#/components/schemas/RegistrarAtendimentoPayload'
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
+              examples:
+              - id_cliente: '10346316758'
+                contato: '+5521999999999'
+                tags: NomeCadastrado
+                bot: Cecilia
+        required: true
       responses:
-        "200":
+        '200':
           description: Registro criado
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChatbotRecordResponse"
-        "400":
+                $ref: '#/components/schemas/ChatbotRecordResponse'
+        '400':
           description: Payload vazio
-        "403":
-          description: Token inválido ou ausente
-        "422":
-          description: Payload inválido
-        "503":
+        '403':
+          description: Token invalido ou ausente
+        '422':
+          description: Payload invalido
+        '503':
           description: Falha ao registrar o evento
-
+      security:
+      - HTTPBearer: []
   /chatbots/registrarContatoInicial:
     post:
-      operationId: registrarContatoInicial
       tags:
-        - Chatbots
+      - Chatbots
       summary: Registrar Contato Inicial
       description: Registra o primeiro contato do cliente na jornada.
-      security:
-        - BearerAuth: []
+      operationId: registrarContatoInicial
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegistrarContatoInicialRequest"
-            examples:
-              contatoInicial:
-                summary: Contato inicial
-                value:
-                  id_cliente: "12345"
-                  contato: "+5521999999999"
-                  motivo: Financeiro
-                  menu: Segunda via
-                  bot: Cecilia
+              $ref: '#/components/schemas/RegistrarContatoInicialPayload'
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
+              examples:
+              - id_cliente: '10346316758'
+                contato: '+5521999999999'
+                motivo: Financeiro
+                menu: Segunda via
+                bot: Cecilia
+        required: true
       responses:
-        "200":
+        '200':
           description: Registro criado
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChatbotRecordResponse"
-        "400":
+                $ref: '#/components/schemas/ChatbotRecordResponse'
+        '400':
           description: Payload vazio
-        "403":
-          description: Token inválido ou ausente
-        "422":
-          description: Payload inválido
-        "503":
+        '403':
+          description: Token invalido ou ausente
+        '422':
+          description: Payload invalido
+        '503':
           description: Falha ao registrar o evento
-
+      security:
+      - HTTPBearer: []
   /chatbots/registrarInteracao:
     post:
-      operationId: registrarInteracao
       tags:
-        - Chatbots
+      - Chatbots
       summary: Registrar Interação
       description: Registra uma interação por IA pela aplicação de chatbot.
-      security:
-        - BearerAuth: []
+      operationId: registrarInteracao
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegistrarInteracaoRequest"
-            examples:
-              interacao:
-                summary: Interação registrada
-                value:
-                  id_cliente: 12345
-                  contato: "+5521999999999"
-                  id_interacao: 1
-                  resumo: Cliente solicitou segunda via do boleto.
-                  bot: Cecilia
+              $ref: '#/components/schemas/RegistrarInteracaoPayload'
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
+              examples:
+              - id_cliente: '10346316758'
+                contato: '+5521999999999'
+                id_interacao: 1
+                resumo: Cliente solicitou segunda via do boleto.
+                bot: Cecilia
+        required: true
       responses:
-        "200":
+        '200':
           description: Registro criado
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChatbotRecordResponse"
-        "400":
+                $ref: '#/components/schemas/ChatbotRecordResponse'
+        '400':
           description: Payload vazio
-        "403":
-          description: Token inválido ou ausente
-        "422":
-          description: Payload inválido
-        "503":
+        '403':
+          description: Token invalido ou ausente
+        '422':
+          description: Payload invalido
+        '503':
           description: Falha ao registrar o evento
-
+      security:
+      - HTTPBearer: []
   /chatbots/registrarAvaliacaoAtendimento:
     post:
-      operationId: registrarAvaliacaoAtendimento
       tags:
-        - Chatbots
+      - Chatbots
       summary: Registrar Avaliação de Atendimento
-      description: Registra avaliação de atendimento enviada pelo cliente ao final do atendimento.
-      security:
-        - BearerAuth: []
+      description: Registra avaliação de atendimento enviada pelo cliente ao final
+        do atendimento.
+      operationId: registrarAvaliacaoAtendimento
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegistrarAvaliacaoAtendimentoRequest"
-            examples:
-              avaliacao:
-                summary: Avaliação registrada
-                value:
-                  id_cliente: 12345
-                  contato: "+5521999999999"
-                  nota: "5"
-                  comentario: Atendimento rápido.
-                  bot: Cecilia
+              $ref: '#/components/schemas/RegistrarAvaliacaoAtendimentoPayload'
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
+              examples:
+              - id_cliente: '10346316758'
+                contato: '+5521999999999'
+                nota: '5'
+                comentario: Atendimento rápido.
+                bot: Cecilia
+        required: true
       responses:
-        "200":
+        '200':
           description: Registro criado
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChatbotRecordResponse"
-        "400":
+                $ref: '#/components/schemas/ChatbotRecordResponse'
+        '400':
           description: Payload vazio
-        "403":
-          description: Token inválido ou ausente
-        "422":
-          description: Payload inválido
-        "503":
+        '403':
+          description: Token invalido ou ausente
+        '422':
+          description: Payload invalido
+        '503':
           description: Falha ao registrar o evento
-
+      security:
+      - HTTPBearer: []
   /chatbots/registrarAtendimentoHumano:
     post:
-      operationId: registrarAtendimentoHumano
       tags:
-        - Chatbots
+      - Chatbots
       summary: Registrar Atendimento Humano
-      description: Registra o momento em que o cliente é encaminhado para atendimento humano.
-      security:
-        - BearerAuth: []
+      description: Registra o momento em que o cliente é encaminhado para atendimento
+        humano.
+      operationId: registrarAtendimentoHumano
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegistrarAtendimentoHumanoRequest"
-            examples:
-              atendimentoHumano:
-                summary: Atendimento humano
-                value:
-                  id_cliente: 12345
-                  contato: "+5521999999999"
-                  pr_resumo: Cliente pediu suporte humano.
-                  tp_atendimento: Financeiro
-                  bot: Cecilia
+              $ref: '#/components/schemas/RegistrarAtendimentoHumanoPayload'
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
+              examples:
+              - id_cliente: '10346316758'
+                contato: '+5521999999999'
+                pr_resumo: Cliente pediu suporte humano.
+                tp_atendimento: Financeiro
+                bot: Cecilia
+        required: true
       responses:
-        "200":
+        '200':
           description: Registro criado
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChatbotRecordResponse"
-        "400":
+                $ref: '#/components/schemas/ChatbotRecordResponse'
+        '400':
           description: Payload vazio
-        "403":
-          description: Token inválido ou ausente
-        "422":
-          description: Payload inválido
-        "503":
+        '403':
+          description: Token invalido ou ausente
+        '422':
+          description: Payload invalido
+        '503':
           description: Falha ao registrar o evento
-
+      security:
+      - HTTPBearer: []
   /chatbots/registrarContatoFinal:
     post:
-      operationId: registrarContatoFinal
       tags:
-        - Chatbots
+      - Chatbots
       summary: Registrar Contato Final
-      description: Registra o encerramento do atendimento e se a demanda do cliente foi resolvida.
-      security:
-        - BearerAuth: []
+      description: Registra o encerramento do atendimento e se a demanda do cliente
+        foi resolvida.
+      operationId: registrarContatoFinal
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegistrarContatoFinalRequest"
-            examples:
-              contatoFinal:
-                summary: Contato final
-                value:
-                  id_cliente: 12345
-                  contato: "+5521999999999"
-                  pr_resolvidosn: S
-                  bot: Cecilia
+              $ref: '#/components/schemas/RegistrarContatoFinalPayload'
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
+              examples:
+              - id_cliente: '10346316758'
+                contato: '+5521999999999'
+                pr_resolvidosn: S
+                bot: Cecilia
+        required: true
       responses:
-        "200":
+        '200':
           description: Registro criado
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChatbotRecordResponse"
-        "400":
+                $ref: '#/components/schemas/ChatbotRecordResponse'
+        '400':
           description: Payload vazio
-        "403":
-          description: Token inválido ou ausente
-        "422":
-          description: Payload inválido
-        "503":
+        '403':
+          description: Token invalido ou ausente
+        '422':
+          description: Payload invalido
+        '503':
           description: Falha ao registrar o evento
-
+      security:
+      - HTTPBearer: []
   /chatbots/registrarServico:
     post:
-      operationId: registrarServico
       tags:
-        - Chatbots
+      - Chatbots
       summary: Registrar Serviço
-      description: Registra solicitações de serviço durante o atendimento do cliente (e.g. segunda via de boleto, registro de ocorrências).
-      security:
-        - BearerAuth: []
+      description: Registra solicitações de serviço durante o atendimento do cliente
+        (e.g. segunda via de boleto, registro de ocorrências).
+      operationId: registrarServico
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegistrarServicoRequest"
-            examples:
-              servico:
-                summary: Serviço registrado
-                value:
-                  id_cliente: 12345
-                  contato: "+5521999999999"
-                  servico: Segunda via de boleto
-                  bot: Cecilia
+              $ref: '#/components/schemas/RegistrarServicoPayload'
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
+              examples:
+              - id_cliente: '10346316758'
+                contato: '+5521999999999'
+                servico: Segunda via de boleto
+                bot: Cecilia
+        required: true
       responses:
-        "200":
+        '200':
           description: Registro criado
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChatbotRecordResponse"
-        "400":
+                $ref: '#/components/schemas/ChatbotRecordResponse'
+        '400':
           description: Payload vazio
-        "403":
-          description: Token inválido ou ausente
-        "422":
-          description: Payload inválido
-        "503":
+        '403':
+          description: Token invalido ou ausente
+        '422':
+          description: Payload invalido
+        '503':
           description: Falha ao registrar o evento
-
+      security:
+      - HTTPBearer: []
+  /shopping/flows/hotspot-access:
+    get:
+      tags:
+      - Shopping
+      summary: Acessos Hotspot de Wi-Fi
+      description: Apresenta registros de acesso ao Wi-Fi, com informações de data,
+        localização aproximada e perfil de acesso. Permite filtros por período.
+      operationId: listarAcessosHotspotShopping
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Start Date
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: End Date
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          minimum: 1
+          default: 100
+          title: Limit
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+          title: Offset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HotspotAccessPage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /shopping/flows/parking-places:
+    get:
+      tags:
+      - Shopping
+      summary: Locais Estacionamento
+      description: Apresenta os locais e tipos associados aos pontos de operação do
+        estacionamento. Pode ser usado para identificar os locais informados nos registros
+        de acesso.
+      operationId: listarLocaisEquipamentosEstacionamento
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          minimum: 1
+          default: 100
+          title: Limit
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+          title: Offset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParkingPlacesPage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /shopping/flows/parking-access:
+    get:
+      tags:
+      - Shopping
+      summary: Acessos Estacionamento
+      description: Apresenta movimentações do estacionamento, incluindo entrada, saída,
+        permanência e informações de pagamento. Quando disponível, cada evento inclui
+        a identificação do local correspondente.
+      operationId: listarAcessosEstacionamento
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Start Date
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: End Date
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          minimum: 1
+          default: 100
+          title: Limit
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+          title: Offset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParkingAccessPage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /shopping/flows/people-access:
+    get:
+      tags:
+      - Shopping
+      summary: Acessos de Pessoas
+      description: Apresenta registros de fluxo de pessoas por data e ponto de entrada,
+        com informações contextuais disponíveis para o período.
+      operationId: listarContagemPessoasShopping
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: start_date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Start Date
+      - name: end_date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: End Date
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          minimum: 1
+          default: 100
+          title: Limit
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+          title: Offset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PeopleAccessPage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /health/db:
     get:
-      operationId: checarBancoDados
       tags:
-        - Health
+      - Health
       summary: Checar Banco de Dados
       description: Verifica se a API consegue abrir conexão com o banco SQL Server.
-      security:
-        - BearerAuth: []
+      operationId: checarBancoDados
       responses:
-        "200":
+        '200':
           description: Conexão com o banco validada
-        "403":
+          content:
+            application/json:
+              schema: {}
+        '403':
           description: Token inválido ou ausente
-        "503":
+        '503':
           description: Falha ao conectar no banco de dados
-
+      security:
+      - HTTPBearer: []
 components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
   schemas:
-    ValidateDocumentRequest:
-      type: object
-      required:
-        - tipo
-        - valor
-      properties:
-        tipo:
-          type: string
-          description: Tipo do documento a validar.
-          enum:
-            - cpf
-            - cnpj
-          example: cpf
-        valor:
-          type: string
-          description: Valor do documento sem pontuação.
-          example: "12345678909"
-
-    ValidateDocumentResponse:
-      type: object
+    ChatbotRecordResponse:
       properties:
         ok:
           type: boolean
-          example: true
-        documento_original:
-          type: string
-          example: "12345678909"
-        documento_valido:
-          type: boolean
-          example: true
-        tipo_documento:
-          type: string
-          example: CPF
-        status_documento:
-          type: string
-          example: VALID_CPF
-          enum:
-            - VALID_CPF
-            - INVALID_CPF_EMPTY
-            - INVALID_CPF_FORMAT
-            - INVALID_CPF_LENGTH
-            - INVALID_CPF_DIGITS
-            - VALID_CNPJ
-            - INVALID_CNPJ_EMPTY
-            - INVALID_CNPJ_FORMAT
-            - INVALID_CNPJ_LENGTH
-            - INVALID_CNPJ_DIGITS
-            - INVALID_DOCUMENT_TYPE
-        motivo_invalido:
-          type: string
-          example: ""
-
-    UpdateClientChargeRequest:
-      type: object
-      required:
-        - contato
-        - status
-      properties:
-        contato:
-          type: string
-          minLength: 1
-          maxLength: 40
-          description: Valor usado para localizar a cobrança; aceita + e pontuação, mas será normalizado para números.
-          example: "+5521999999999"
-        status:
-          type: string
-          minLength: 1
-          maxLength: 255
-          description: Novo status da cobrança.
-          example: Atual (Com Projeção)
-        resposta:
-          anyOf:
-            - type: string
-              maxLength: 2000
-            - type: "null"
-          description: Resposta ou observação retornada pelo cliente.
-          example: Cliente informou previsão de pagamento.
-        dt_projecao_pgto:
-          anyOf:
-            - type: string
-              format: date
-            - type: "null"
-          description: Data projetada de pagamento no formato YYYY-MM-DD.
-          example: "2026-06-30"
-
-    UpdateClientChargeResponse:
-      type: object
-      required:
-        - ok
-        - updated_count
-        - contato
-      properties:
-        ok:
-          type: boolean
-          description: Indica se a atualização foi processada.
-          example: true
-        updated_count:
+          title: Ok
+          description: Indica se o registro foi processado
+        inserted_count:
           type: integer
-          description: Quantidade de cobranças atualizadas.
-          example: 1
-        contato:
+          title: Inserted Count
+          description: Quantidade de registros inseridos
+        event:
           type: string
-          description: Contato usado no filtro.
-          example: "5521999999999"
-
-    ChatbotEventRequest:
+          title: Event
+          description: Evento registrado pela aplicacao
+        reference:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reference
+          description: Referencia de rastreamento retornada em caso de falha
       type: object
-      additionalProperties: true
-      description: Campos comuns dos eventos de chatbot. Os campos id_cliente e bot são obrigatórios. contato é opcional. dt_interacao é preenchido automaticamente pela API.
       required:
-        - id_cliente
-        - bot
+      - ok
+      - inserted_count
+      - event
+      title: ChatbotRecordResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HotspotAccess:
+      properties:
+        id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Id
+        dh_acesso:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Dh Acesso
+        dt_acesso:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dt Acesso
+        hr_acesso:
+          anyOf:
+          - type: string
+            format: time
+          - type: 'null'
+          title: Hr Acesso
+        sexo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sexo
+        dt_nascimento:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dt Nascimento
+        tp_aparelho:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tp Aparelho
+        cep:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cep
+        uf:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Uf
+        cidade:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cidade
+        bairro:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bairro
+        ar_influencia:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ar Influencia
+        id_lancamento:
+          anyOf:
+          - type: integer
+          - type: string
+          title: Id Lancamento
+        cpf:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cpf
+          description: CPF supplied by the hotspot source; confidential personal data
+      type: object
+      required:
+      - id_lancamento
+      title: HotspotAccess
+    HotspotAccessPage:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+        offset:
+          type: integer
+          title: Offset
+        count:
+          type: integer
+          title: Count
+        items:
+          items:
+            $ref: '#/components/schemas/HotspotAccess'
+          type: array
+          title: Items
+      type: object
+      required:
+      - limit
+      - offset
+      - count
+      - items
+      title: HotspotAccessPage
+    ParkingAccess:
+      properties:
+        id:
+          type: integer
+          title: Id
+        tp_acesso:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tp Acesso
+        placa:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Placa
+          description: Vehicle plate supplied by Per2Park; confidential data
+        plano:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Plano
+        tp_veiculo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tp Veiculo
+        dh_entrada:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Dh Entrada
+        dt_entrada:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dt Entrada
+        hr_entrada:
+          anyOf:
+          - type: string
+            format: time
+          - type: 'null'
+          title: Hr Entrada
+        eq_entrada:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Eq Entrada
+        entrada_local:
+          anyOf:
+          - $ref: '#/components/schemas/ParkingPlace'
+          - type: 'null'
+        dh_saida:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Dh Saida
+        dt_saida:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dt Saida
+        hr_saida:
+          anyOf:
+          - type: string
+            format: time
+          - type: 'null'
+          title: Hr Saida
+        eq_saida:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Eq Saida
+        saida_local:
+          anyOf:
+          - $ref: '#/components/schemas/ParkingPlace'
+          - type: 'null'
+        dh_pagamento:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Dh Pagamento
+        dt_pagamento:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dt Pagamento
+        hr_pagamento:
+          anyOf:
+          - type: string
+            format: time
+          - type: 'null'
+          title: Hr Pagamento
+        eq_pagamento:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Eq Pagamento
+        pagamento_local:
+          anyOf:
+          - $ref: '#/components/schemas/ParkingPlace'
+          - type: 'null'
+        vl_pagamento:
+          anyOf:
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          - type: 'null'
+          title: Vl Pagamento
+        fr_pagamento:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Fr Pagamento
+        bandeira:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bandeira
+        mi_duracao:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Mi Duracao
+        nm_voucher:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Nm Voucher
+        dh_voucher:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Dh Voucher
+        dt_voucher:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dt Voucher
+        hr_voucher:
+          anyOf:
+          - type: string
+            format: time
+          - type: 'null'
+          title: Hr Voucher
+        eq_voucher:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Eq Voucher
+        voucher_local:
+          anyOf:
+          - $ref: '#/components/schemas/ParkingPlace'
+          - type: 'null'
+      type: object
+      required:
+      - id
+      title: ParkingAccess
+    ParkingAccessPage:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+        offset:
+          type: integer
+          title: Offset
+        count:
+          type: integer
+          title: Count
+        items:
+          items:
+            $ref: '#/components/schemas/ParkingAccess'
+          type: array
+          title: Items
+      type: object
+      required:
+      - limit
+      - offset
+      - count
+      - items
+      title: ParkingAccessPage
+    ParkingPlace:
+      properties:
+        equipamento:
+          type: string
+          title: Equipamento
+        lugar:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Lugar
+        tipo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tipo
+      type: object
+      required:
+      - equipamento
+      title: ParkingPlace
+    ParkingPlacesPage:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+        offset:
+          type: integer
+          title: Offset
+        count:
+          type: integer
+          title: Count
+        items:
+          items:
+            $ref: '#/components/schemas/ParkingPlace'
+          type: array
+          title: Items
+      type: object
+      required:
+      - limit
+      - offset
+      - count
+      - items
+      title: ParkingPlacesPage
+    PeopleAccess:
+      properties:
+        id:
+          type: integer
+          title: Id
+        dt_acesso:
+          type: string
+          format: date
+          title: Dt Acesso
+        clima:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Clima
+        entrada:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Entrada
+        pessoas:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Pessoas
+      type: object
+      required:
+      - id
+      - dt_acesso
+      title: PeopleAccess
+    PeopleAccessPage:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+        offset:
+          type: integer
+          title: Offset
+        count:
+          type: integer
+          title: Count
+        items:
+          items:
+            $ref: '#/components/schemas/PeopleAccess'
+          type: array
+          title: Items
+      type: object
+      required:
+      - limit
+      - offset
+      - count
+      - items
+      title: PeopleAccessPage
+    RegistrarAtendimentoHumanoPayload:
       properties:
         id_cliente:
           anyOf:
-            - type: string
-            - type: integer
-          description: Identificador do cliente na aplicação de chatbot.
-          example: "10346316758"
+          - type: string
+          - type: integer
+          title: Id Cliente
+          description: Identificador do cliente na aplicação de chatbot
+          examples:
+          - '10346316758'
         bot:
           type: string
-          minLength: 1
           maxLength: 255
-          description: Nome do bot/interface responsável pelo atendimento.
-          example: Cecilia
+          minLength: 1
+          title: Bot
+          description: Nome do bot/interface responsável pelo atendimento
+          examples:
+          - Cecilia
         contato:
           anyOf:
-            - type: string
-              maxLength: 255
-            - type: "null"
-          description: Contato do cliente relacionado ao atendimento.
-          example: "+5521999999999"
-      example:
-        id_cliente: "10346316758"
-        contato: "+5521999999999"
-        bot: Cecilia
-
-    RegistrarAtendimentoRequest:
-      allOf:
-        - $ref: "#/components/schemas/ChatbotEventRequest"
-        - type: object
-          properties:
-            tags:
-              anyOf:
-                - type: string
-                - type: "null"
-              description: Tags associadas ao atendimento.
-              example: NomeCadastrado
-
-    RegistrarContatoInicialRequest:
-      allOf:
-        - $ref: "#/components/schemas/ChatbotEventRequest"
-        - type: object
-          properties:
-            motivo:
-              anyOf:
-                - type: string
-                - type: "null"
-              description: Motivo informado no primeiro contato.
-              example: Financeiro
-            menu:
-              anyOf:
-                - type: string
-                - type: "null"
-              description: Opção de menu selecionada pelo cliente.
-              example: Segunda via
-
-    RegistrarInteracaoRequest:
-      allOf:
-        - $ref: "#/components/schemas/ChatbotEventRequest"
-        - type: object
-          properties:
-            id_interacao:
-              anyOf:
-                - type: integer
-                - type: string
-                - type: "null"
-              description: Identificador da interação na jornada do atendimento.
-              example: 1
-            resumo:
-              anyOf:
-                - type: string
-                - type: "null"
-              description: Resumo da interação por IA.
-              example: Cliente solicitou segunda via do boleto.
-
-    RegistrarAvaliacaoAtendimentoRequest:
-      allOf:
-        - $ref: "#/components/schemas/ChatbotEventRequest"
-        - type: object
-          properties:
-            nota:
-              anyOf:
-                - type: string
-                - type: "null"
-              description: Nota da avaliação enviada pelo cliente.
-              example: "5"
-            comentario:
-              anyOf:
-                - type: string
-                - type: "null"
-              description: Comentário da avaliação enviada pelo cliente.
-              example: Atendimento rápido.
-
-    RegistrarAtendimentoHumanoRequest:
-      allOf:
-        - $ref: "#/components/schemas/ChatbotEventRequest"
-        - type: object
-          properties:
-            pr_resumo:
-              anyOf:
-                - type: string
-                - type: "null"
-              description: Resumo do encaminhamento para atendimento humano.
-              example: Cliente pediu suporte humano.
-            tp_atendimento:
-              anyOf:
-                - type: string
-                - type: "null"
-              description: Tipo de atendimento humano solicitado.
-              example: Financeiro
-
-    RegistrarContatoFinalRequest:
-      allOf:
-        - $ref: "#/components/schemas/ChatbotEventRequest"
-        - type: object
-          properties:
-            pr_resolvidosn:
-              anyOf:
-                - type: string
-                - type: "null"
-              description: Indica se a demanda do cliente foi resolvida.
-              example: S
-
-    RegistrarServicoRequest:
-      allOf:
-        - $ref: "#/components/schemas/ChatbotEventRequest"
-        - type: object
-          properties:
-            servico:
-              anyOf:
-                - type: string
-                - type: "null"
-              description: Serviço solicitado durante o atendimento.
-              example: Segunda via de boleto
-
-    ChatbotRecordResponse:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Contato
+          description: Contato do cliente relacionado ao atendimento
+          examples:
+          - '+5521999999999'
+        pr_resumo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pr Resumo
+          description: Resumo do encaminhamento para atendimento humano
+          examples:
+          - Cliente pediu suporte humano.
+        tp_atendimento:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tp Atendimento
+          description: Tipo de atendimento humano solicitado
+          examples:
+          - Financeiro
+      additionalProperties: false
       type: object
       required:
-        - ok
-        - inserted_count
-        - event
+      - id_cliente
+      - bot
+      title: RegistrarAtendimentoHumanoPayload
+    RegistrarAtendimentoPayload:
+      properties:
+        id_cliente:
+          anyOf:
+          - type: string
+          - type: integer
+          title: Id Cliente
+          description: Identificador do cliente na aplicação de chatbot
+          examples:
+          - '10346316758'
+        bot:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Bot
+          description: Nome do bot/interface responsável pelo atendimento
+          examples:
+          - Cecilia
+        contato:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Contato
+          description: Contato do cliente relacionado ao atendimento
+          examples:
+          - '+5521999999999'
+        tags:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tags
+          description: Tags associadas ao atendimento
+          examples:
+          - NomeCadastrado
+      additionalProperties: false
+      type: object
+      required:
+      - id_cliente
+      - bot
+      title: RegistrarAtendimentoPayload
+    RegistrarAvaliacaoAtendimentoPayload:
+      properties:
+        id_cliente:
+          anyOf:
+          - type: string
+          - type: integer
+          title: Id Cliente
+          description: Identificador do cliente na aplicação de chatbot
+          examples:
+          - '10346316758'
+        bot:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Bot
+          description: Nome do bot/interface responsável pelo atendimento
+          examples:
+          - Cecilia
+        contato:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Contato
+          description: Contato do cliente relacionado ao atendimento
+          examples:
+          - '+5521999999999'
+        nota:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Nota
+          description: Nota da avaliação enviada pelo cliente
+          examples:
+          - '5'
+        comentario:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Comentario
+          description: Comentário da avaliação enviada pelo cliente
+          examples:
+          - Atendimento rápido.
+      additionalProperties: false
+      type: object
+      required:
+      - id_cliente
+      - bot
+      title: RegistrarAvaliacaoAtendimentoPayload
+    RegistrarContatoFinalPayload:
+      properties:
+        id_cliente:
+          anyOf:
+          - type: string
+          - type: integer
+          title: Id Cliente
+          description: Identificador do cliente na aplicação de chatbot
+          examples:
+          - '10346316758'
+        bot:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Bot
+          description: Nome do bot/interface responsável pelo atendimento
+          examples:
+          - Cecilia
+        contato:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Contato
+          description: Contato do cliente relacionado ao atendimento
+          examples:
+          - '+5521999999999'
+        pr_resolvidosn:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pr Resolvidosn
+          description: Indica se a demanda do cliente foi resolvida
+          examples:
+          - S
+      additionalProperties: false
+      type: object
+      required:
+      - id_cliente
+      - bot
+      title: RegistrarContatoFinalPayload
+    RegistrarContatoInicialPayload:
+      properties:
+        id_cliente:
+          anyOf:
+          - type: string
+          - type: integer
+          title: Id Cliente
+          description: Identificador do cliente na aplicação de chatbot
+          examples:
+          - '10346316758'
+        bot:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Bot
+          description: Nome do bot/interface responsável pelo atendimento
+          examples:
+          - Cecilia
+        contato:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Contato
+          description: Contato do cliente relacionado ao atendimento
+          examples:
+          - '+5521999999999'
+        motivo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Motivo
+          description: Motivo informado no primeiro contato
+          examples:
+          - Financeiro
+        menu:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Menu
+          description: Opção de menu selecionada pelo cliente
+          examples:
+          - Segunda via
+      additionalProperties: false
+      type: object
+      required:
+      - id_cliente
+      - bot
+      title: RegistrarContatoInicialPayload
+    RegistrarInteracaoPayload:
+      properties:
+        id_cliente:
+          anyOf:
+          - type: string
+          - type: integer
+          title: Id Cliente
+          description: Identificador do cliente na aplicação de chatbot
+          examples:
+          - '10346316758'
+        bot:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Bot
+          description: Nome do bot/interface responsável pelo atendimento
+          examples:
+          - Cecilia
+        contato:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Contato
+          description: Contato do cliente relacionado ao atendimento
+          examples:
+          - '+5521999999999'
+        id_interacao:
+          anyOf:
+          - type: integer
+          - type: string
+          - type: 'null'
+          title: Id Interacao
+          description: Identificador da interação na jornada do atendimento
+          examples:
+          - 1
+        resumo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resumo
+          description: Resumo da interação por IA
+          examples:
+          - Cliente solicitou segunda via do boleto.
+      additionalProperties: false
+      type: object
+      required:
+      - id_cliente
+      - bot
+      title: RegistrarInteracaoPayload
+    RegistrarServicoPayload:
+      properties:
+        id_cliente:
+          anyOf:
+          - type: string
+          - type: integer
+          title: Id Cliente
+          description: Identificador do cliente na aplicação de chatbot
+          examples:
+          - '10346316758'
+        bot:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Bot
+          description: Nome do bot/interface responsável pelo atendimento
+          examples:
+          - Cecilia
+        contato:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Contato
+          description: Contato do cliente relacionado ao atendimento
+          examples:
+          - '+5521999999999'
+        servico:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Servico
+          description: Serviço solicitado durante o atendimento
+          examples:
+          - Segunda via de boleto
+      additionalProperties: false
+      type: object
+      required:
+      - id_cliente
+      - bot
+      title: RegistrarServicoPayload
+    UpdateClientChargeInput:
+      properties:
+        contato:
+          type: string
+          maxLength: 40
+          minLength: 1
+          title: Contato
+          description: Valor usado para localizar a cobrança; aceita + e pontuação,
+            mas será normalizado para números
+          examples:
+          - '+5521999999999'
+        status:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Status
+          description: Novo status da cobrança
+          examples:
+          - Atual (Com Projeção)
+        resposta:
+          anyOf:
+          - type: string
+            maxLength: 2000
+          - type: 'null'
+          title: Resposta
+          description: Resposta ou observação retornada pelo cliente
+          examples:
+          - Cliente informou previsão de pagamento.
+        dt_projecao_pgto:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dt Projecao Pgto
+          description: Data projetada de pagamento no formato YYYY-MM-DD
+          examples:
+          - '2026-06-30'
+      type: object
+      required:
+      - contato
+      - status
+      title: UpdateClientChargeInput
+    UpdateClientChargeResponse:
       properties:
         ok:
           type: boolean
-          description: Indica se o registro foi processado.
-          example: true
-        inserted_count:
+          title: Ok
+          description: Indica se a atualização foi processada
+        updated_count:
           type: integer
-          description: Quantidade de registros inseridos.
-          example: 1
-        event:
+          title: Updated Count
+          description: Quantidade de cobranças atualizadas
+        contato:
           type: string
-          description: Evento registrado pela aplicação.
-          example: Registrar Atendimento
-        reference:
+          title: Contato
+          description: Contato usado no filtro
+      type: object
+      required:
+      - ok
+      - updated_count
+      - contato
+      title: UpdateClientChargeResponse
+    ValidateDocumentInput:
+      properties:
+        tipo:
+          type: string
+          enum:
+          - cpf
+          - cnpj
+          title: Tipo
+          description: Tipo de documento que será validado. Use 'cpf' para CPF ou
+            'cnpj' para CNPJ
+          examples:
+          - cpf
+        valor:
+          type: string
+          title: Valor
+          description: Documento a ser validado exatamente como foi recebido pela
+            aplicação de origem
+          examples:
+          - '12345678909'
+      type: object
+      required:
+      - tipo
+      - valor
+      title: ValidateDocumentInput
+    ValidateDocumentResponse:
+      properties:
+        valid_doc:
+          type: boolean
+          title: Valid Doc
+          description: Indica se o documento informado é válido
+        status:
+          type: string
+          title: Status
+          description: Status técnico da validação do documento
+        notes:
           anyOf:
+          - type: string
+          - type: 'null'
+          title: Notes
+          description: Mensagem pronta para retorno ao usuário
+      type: object
+      required:
+      - valid_doc
+      - status
+      title: ValidateDocumentResponse
+    ValidateNameInput:
+      properties:
+        nome:
+          title: Nome
+          description: Nome a ser validado, exatamente como foi recebido pelo sistema
+            de origem
+          examples:
+          - Maria da Silva
+      type: object
+      title: ValidateNameInput
+    ValidateNameResponse:
+      properties:
+        nome_original:
+          type: string
+          title: Nome Original
+          description: Valor recebido após a remoção de espaços no início e no final
+        nome_tratado:
+          type: string
+          title: Nome Tratado
+          description: Nome com espaços e capitalização padronizados
+        nome_valido:
+          type: boolean
+          title: Nome Valido
+          description: Indica se o valor atende às regras de validação de nome
+        status_nome:
+          type: string
+          enum:
+          - VALID_NAME
+          - INVALID_NAME
+          title: Status Nome
+          description: Status técnico da validação do nome
+        motivo_nome_invalido:
+          type: string
+          title: Motivo Nome Invalido
+          description: Motivo da rejeição; retorna uma string vazia quando o nome
+            é válido
+      type: object
+      required:
+      - nome_original
+      - nome_tratado
+      - nome_valido
+      - status_nome
+      - motivo_nome_invalido
+      title: ValidateNameResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
             - type: string
-            - type: "null"
-          description: Referência de rastreamento retornada em caso de falha.
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
+tags:
+- name: General
+  description: API for general use
+- name: Sinal
+  description: API for Sinal data
+- name: Harmonia
+  description: API for Harmonia data
+- name: 3M
+  description: API for 3M data
+- name: Shopping
+  description: API for Shopping data
+- name: Chatbots
+  description: API for chatbot application events
+- name: Health
+  description: API health checks and infrastructure diagnostics

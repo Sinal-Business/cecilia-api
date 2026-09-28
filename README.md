@@ -286,6 +286,36 @@ Example response:
 }
 ```
 
+### Shopping flows
+
+The Shopping read endpoints expose the four `spro_flows_*` datasets. They are
+protected by bearer authentication, return at most 500 rows per request, and
+use `limit` and `offset` for pagination.
+
+| Nome | Endpoint | Descrição |
+| --- | --- | --- |
+| Acessos Hotspot de Wi-Fi | `GET /shopping/flows/hotspot-access` | Registros de acesso com data, localização aproximada e perfil de acesso. |
+| Acessos Estacionamento | `GET /shopping/flows/parking-access` | Movimentações de entrada, saída, permanência e pagamento. |
+| Locais Estacionamento | `GET /shopping/flows/parking-places` | Locais e tipos associados aos pontos de operação do estacionamento. |
+| Acessos de Pessoas | `GET /shopping/flows/people-access` | Fluxo de pessoas por data e ponto de entrada, com informações contextuais. |
+
+Example:
+
+```http
+GET /shopping/flows/parking-access?start_date=2026-09-01&end_date=2026-09-30&limit=100&offset=0
+Authorization: Bearer <TOKEN>
+```
+
+`parking-access` resolves `eq_entrada`, `eq_saida`, `eq_pagamento`, and
+`eq_voucher` against `parkingplaces.equipamento`. The response retains each
+raw equipment code and, when a reference exists, adds `entrada_local`,
+`saida_local`, `pagamento_local`, or `voucher_local` with the equipment,
+place, and type. This is a left-join relationship, so an access row is not
+discarded when its equipment has not yet been registered in `parkingplaces`.
+
+Hotspot CPF and parking vehicle plate fields are confidential. Clients must
+request only the necessary period and avoid logging or redistributing them.
+
 ## 🐳 Docker
 
 Create a local `.env` file with the required variables, then run:

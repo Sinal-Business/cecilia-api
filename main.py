@@ -3,6 +3,7 @@ from fastapi.openapi.docs import get_redoc_html
 from routers.adm import router as adm_router
 from routers.chatbots import router as chatbots_router
 from routers.health import router as health_router
+from routers.shopping import router as shopping_router
 from routers.validations import router as validations_router
 
 
@@ -40,6 +41,7 @@ tags_metadata = [
 app = FastAPI(
     title="CECILia API",
     version="2.0.0",
+    servers=[{"url": "https://sinalbusiness-cecilia-api.onrender.com"}],
     description="""
 API de serviços da Sinal Business
 
@@ -70,4 +72,5 @@ def custom_redoc():
 app.include_router(validations_router)
 app.include_router(adm_router)
 app.include_router(chatbots_router)
+app.include_router(shopping_router)
 app.include_router(health_router)
