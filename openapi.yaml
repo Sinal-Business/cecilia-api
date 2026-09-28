@@ -767,6 +767,126 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /shopping/finance/sales:
+    get:
+      tags:
+      - Shopping
+      summary: Vendas por Loja
+      description: Apresenta vendas acumuladas por loja, LUC e data de referencia.
+        Por padrao, retorna somente snapshots de fechamento mensal para evitar a soma
+        indevida dos valores acumulados registrados diariamente.
+      operationId: listarVendasShopping
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: start_date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          description: Data inicial inclusiva
+          title: Start Date
+        description: Data inicial inclusiva
+      - name: end_date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          description: Data final inclusiva; maximo de 31 dias
+          title: End Date
+        description: Data final inclusiva; maximo de 31 dias
+      - name: loja
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 255
+          - type: 'null'
+          title: Loja
+      - name: luc
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 10
+          - type: 'null'
+          title: Luc
+      - name: categoria
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 255
+          - type: 'null'
+          title: Categoria
+      - name: segmento
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 255
+          - type: 'null'
+          title: Segmento
+      - name: classificacao
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 255
+          - type: 'null'
+          title: Classificacao
+      - name: month_end_only
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Quando true, retorna apenas o ultimo snapshot de cada mes
+          default: true
+          title: Month End Only
+        description: Quando true, retorna apenas o ultimo snapshot de cada mes
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          minimum: 1
+          default: 100
+          title: Limit
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 10000
+          minimum: 0
+          default: 0
+          title: Offset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShoppingSalesPage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /health/db:
     get:
       tags:
@@ -1528,6 +1648,68 @@ components:
       - id_cliente
       - bot
       title: RegistrarServicoPayload
+    ShoppingSale:
+      properties:
+        id:
+          type: integer
+          title: Id
+        loja:
+          type: string
+          title: Loja
+        luc:
+          type: string
+          title: Luc
+        dt_referencia:
+          type: string
+          format: date
+          title: Dt Referencia
+        vl_vendido:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Vl Vendido
+        categoria:
+          type: string
+          title: Categoria
+        segmento:
+          type: string
+          title: Segmento
+        classificacao:
+          type: string
+          title: Classificacao
+      type: object
+      required:
+      - id
+      - loja
+      - luc
+      - dt_referencia
+      - vl_vendido
+      - categoria
+      - segmento
+      - classificacao
+      title: ShoppingSale
+    ShoppingSalesPage:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+        offset:
+          type: integer
+          title: Offset
+        count:
+          type: integer
+          title: Count
+        items:
+          items:
+            $ref: '#/components/schemas/ShoppingSale'
+          type: array
+          title: Items
+      type: object
+      required:
+      - limit
+      - offset
+      - count
+      - items
+      title: ShoppingSalesPage
     UpdateClientChargeInput:
       properties:
         contato:

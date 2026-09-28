@@ -318,6 +318,22 @@ discarded when its equipment has not yet been registered in `parkingplaces`.
 Hotspot CPF and parking vehicle plate fields are confidential. Clients must
 request only the necessary period and avoid logging or redistributing them.
 
+### Shopping sales
+
+`GET /shopping/finance/sales` exposes `spro_financeiro_vendas` with bearer
+authentication, bounded pagination, and a mandatory inclusive date range of at
+most 31 days. Exact filters are available for `loja`, `luc`, `categoria`,
+`segmento`, and `classificacao`.
+
+The endpoint defaults to `month_end_only=true`. Historical records can be
+cumulative daily snapshots, so summing every date in a month would overstate
+sales. Use `month_end_only=false` only to inspect the daily cumulative series.
+
+```http
+GET /shopping/finance/sales?start_date=2026-08-01&end_date=2026-08-31&month_end_only=true&limit=100&offset=0
+Authorization: Bearer <TOKEN>
+```
+
 ## 🐳 Docker
 
 Create a local `.env` file with the required variables, then run:

@@ -95,3 +95,18 @@ class ParkingAccess(BaseModel):
 
 class ParkingAccessPage(PageInfo):
     items: list[ParkingAccess]
+
+
+class ShoppingSale(BaseModel):
+    id: int
+    loja: str
+    luc: str
+    dt_referencia: date
+    vl_vendido: Decimal
+    categoria: str
+    segmento: str
+    classificacao: str
+
+
+class ShoppingSalesPage(PageInfo):
+    items: list[ShoppingSale]

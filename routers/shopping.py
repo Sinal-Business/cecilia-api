@@ -12,11 +12,12 @@ from schemas.shopping import (
     ParkingAccessPage,
     ParkingPlacesPage,
     PeopleAccessPage,
+    ShoppingSalesPage,
 )
 
 
 router = APIRouter(
-    prefix="/shopping/flows",
+    prefix="/shopping",
     tags=["Shopping"],
     dependencies=[Depends(verify)],
 )
@@ -26,6 +27,7 @@ HOTSPOT_TABLE = "dbo.spro_flows_hotspotaccess"
 PARKING_ACCESS_TABLE = "dbo.spro_flows_parkingaccess"
 PARKING_PLACES_TABLE = "dbo.spro_flows_parkingplaces"
 PEOPLE_TABLE = "dbo.spro_flows_peopleaccess"
+SALES_TABLE = "dbo.spro_financeiro_vendas"
 MAX_QUERY_PERIOD = timedelta(days=30)
 
 
@@ -61,11 +63,11 @@ def _query_page(sql: str, params: list, limit: int, offset: int):
             return _rows_as_dicts(cursor)
     except Exception:
         reference = secrets.token_hex(4).upper()
-        logger.exception("Shopping flows query failed: reference=%s", reference)
+        logger.exception("Shopping query failed: reference=%s", reference)
         return JSONResponse(
             status_code=503,
             content={
-                "detail": "Nao foi possivel consultar os dados de fluxo do shopping",
+                "detail": "Nao foi possivel consultar os dados do shopping",
                 "reference": reference,
             },
             headers={"X-Request-Reference": reference},
@@ -77,7 +79,7 @@ def _page(items, limit: int, offset: int):
 
 
 @router.get(
-    "/hotspot-access",
+    "/flows/hotspot-access",
     response_model=HotspotAccessPage,
     operation_id="listarAcessosHotspotShopping",
     summary="Acessos Hotspot de Wi-Fi",
@@ -107,7 +109,7 @@ def list_hotspot_access(
 
 
 @router.get(
-    "/parking-places",
+    "/flows/parking-places",
     response_model=ParkingPlacesPage,
     operation_id="listarLocaisEquipamentosEstacionamento",
     summary="Locais Estacionamento",
@@ -141,7 +143,7 @@ def _parking_place(row: dict, prefix: str):
 
 
 @router.get(
-    "/parking-access",
+    "/flows/parking-access",
     response_model=ParkingAccessPage,
     operation_id="listarAcessosEstacionamento",
     summary="Acessos Estacionamento",
@@ -194,7 +196,7 @@ def list_parking_access(
 
 
 @router.get(
-    "/people-access",
+    "/flows/people-access",
     response_model=PeopleAccessPage,
     operation_id="listarContagemPessoasShopping",
     summary="Acessos de Pessoas",
@@ -215,6 +217,59 @@ def list_people_access(
         FROM {PEOPLE_TABLE}
         {where}
         ORDER BY dt_acesso DESC, entrada, id DESC
+        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+    """
+    items = _query_page(sql, params, limit, offset)
+    return items if isinstance(items, JSONResponse) else _page(items, limit, offset)
+
+
+@router.get(
+    "/finance/sales",
+    response_model=ShoppingSalesPage,
+    operation_id="listarVendasShopping",
+    summary="Vendas por Loja",
+    description=(
+        "Apresenta vendas acumuladas por loja, LUC e data de referencia. "
+        "Por padrao, retorna somente snapshots de fechamento mensal para evitar "
+        "a soma indevida dos valores acumulados registrados diariamente."
+    ),
+)
+def list_sales(
+    start_date: date = Query(..., description="Data inicial inclusiva"),
+    end_date: date = Query(..., description="Data final inclusiva; maximo de 31 dias"),
+    loja: str | None = Query(None, min_length=1, max_length=255),
+    luc: str | None = Query(None, min_length=1, max_length=10),
+    categoria: str | None = Query(None, min_length=1, max_length=255),
+    segmento: str | None = Query(None, min_length=1, max_length=255),
+    classificacao: str | None = Query(None, min_length=1, max_length=255),
+    month_end_only: bool = Query(
+        True,
+        description="Quando true, retorna apenas o ultimo snapshot de cada mes",
+    ),
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0, le=10000),
+):
+    where, params = _date_where("dt_referencia", start_date, end_date)
+    filters = [
+        ("loja", loja),
+        ("luc", luc),
+        ("categoria", categoria),
+        ("segmento", segmento),
+        ("classificacao", classificacao),
+    ]
+    for column, value in filters:
+        if value is not None:
+            where += f" AND {column} = ?"
+            params.append(value.strip())
+    if month_end_only:
+        where += " AND dt_referencia = EOMONTH(dt_referencia)"
+
+    sql = f"""
+        SELECT id, loja, luc, dt_referencia, vl_vendido,
+               categoria, segmento, classificacao
+        FROM {SALES_TABLE}
+        {where}
+        ORDER BY dt_referencia DESC, loja, luc, id
         OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
     """
     items = _query_page(sql, params, limit, offset)
