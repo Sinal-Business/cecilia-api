@@ -43,19 +43,35 @@ app = FastAPI(
     version="2.0.0",
     servers=[{"url": "https://sinalbusiness-cecilia-api.onrender.com"}],
     description="""
-API de serviços da Sinal Business
+API services for Sinal Business.
 
-### ⚠️ Autenticação:  
+### Authentication
 
-Para utilizar os recursos é necessário se autenticar utilizando o TOKEN com as credenciais fornecidas.  
+Send the assigned credential as `Authorization: Bearer TOKEN`.
 
-> Se você não tem esse acesso, contate o time técnico responsável  
+- `TOKEN` is the primary credential and can access every protected endpoint.
+- `TOKEN_SECONDARY` is reserved for the Skeps IA Skill at
+  [ia.skeps.com.br](https://ia.skeps.com.br). It can access only the five
+  documented read-only Shopping endpoints.
+- The Skeps token cannot call `POST`, `PATCH`, or any protected endpoint that
+  is not explicitly allowlisted.
 
-As credenciais devem ser informadas no header `Authorization` da requisição:
+Current Skeps allowlist:
+
+- `GET /shopping/flows/hotspot-access`
+- `GET /shopping/flows/parking-access`
+- `GET /shopping/flows/parking-places`
+- `GET /shopping/flows/people-access`
+- `GET /shopping/finance/sales`
+
+Skeps IA is the organization-wide AI hub, organized into the Sinal and Caucaia
+platforms. New endpoints are denied to its token until they are reviewed and
+added to the allowlist.
 
 ```http
 Authorization: Bearer TOKEN
 Content-Type: application/json
+```
 """,
     openapi_tags=tags_metadata,
     docs_url=None,

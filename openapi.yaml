@@ -1,11 +1,23 @@
 openapi: 3.1.0
 info:
   title: CECILia API
-  description: "\nAPI de serviços da Sinal Business\n\n### ⚠️ Autenticação:  \n\n\
-    Para utilizar os recursos é necessário se autenticar utilizando o TOKEN com as\
-    \ credenciais fornecidas.  \n\n> Se você não tem esse acesso, contate o time técnico\
-    \ responsável  \n\nAs credenciais devem ser informadas no header `Authorization`\
-    \ da requisição:\n\n```http\nAuthorization: Bearer TOKEN\nContent-Type: application/json\n"
+  description: |
+    API services for Sinal Business.
+
+    `TOKEN` is the primary credential and can access every protected endpoint.
+    `TOKEN_SECONDARY` belongs to the Skeps IA Skill at https://ia.skeps.com.br,
+    the organization-wide AI hub organized into the Sinal and Caucaia platforms.
+
+    The secondary token is restricted to the documented read-only Shopping
+    endpoint allowlist. It cannot call POST, PATCH, `/health/db`, or any future
+    protected endpoint unless that endpoint is explicitly reviewed and added.
+
+    Current Skeps allowlist:
+    - `GET /shopping/flows/hotspot-access`
+    - `GET /shopping/flows/parking-access`
+    - `GET /shopping/flows/parking-places`
+    - `GET /shopping/flows/people-access`
+    - `GET /shopping/finance/sales`
   version: 2.0.0
 servers:
 - url: https://sinalbusiness-cecilia-api.onrender.com
