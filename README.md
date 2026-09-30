@@ -1,4 +1,4 @@
-\# CECILia API \<img *src*="https\://snipboard.io/rlh6gz.jpg" *width*="10%" *align*="right" *valign*="middle" *alt*="CECILia logo"/>
+# CECILia API <img src="https://snipboard.io/rlh6gz.jpg" width="10%" align="right" valign="middle" alt="CECILia logo"/>
 
 
 
@@ -6,143 +6,139 @@ Service API from Sinal Business
 
 
 
-\<div *align*="center">
+<div align="center">
 
 
 
-![version]\(https\://img.shields.io/badge/version-2.0.0-red.svg)
+![version](https://img.shields.io/badge/version-2.0.0-red.svg)
 
-![status]\(https\://img.shields.io/badge/status-stable-006400.svg)
+![status](https://img.shields.io/badge/status-stable-006400.svg)
 
-![python]\(https\://img.shields.io/badge/Python-3.10-3776AB.svg?logo=python&logoColor=white)
+![python](https://img.shields.io/badge/Python-3.10-3776AB.svg?logo=python&logoColor=white)
 
-![fastapi]\(https\://img.shields.io/badge/FastAPI-API-009688.svg?logo=fastapi&logoColor=white)
+![fastapi](https://img.shields.io/badge/FastAPI-API-009688.svg?logo=fastapi&logoColor=white)
 
-![docker]\(https\://img.shields.io/badge/Docker-ready-2496ED.svg?logo=docker&logoColor=white)
+![docker](https://img.shields.io/badge/Docker-ready-2496ED.svg?logo=docker&logoColor=white)
 
-[![docs]\(https\://img.shields.io/badge/docs-ReDoc-85EA2D.svg)]\(https\://chat-gdatabot.onrender.com/docs)
+[![docs](https://img.shields.io/badge/docs-ReDoc-85EA2D.svg)](https://chat-gdatabot.onrender.com/docs)
 
-![security]\(https\://img.shields.io/badge/security-Bearer_token-important.svg)
+</div>
 
 
 
-\</div>
+<details>
 
+  <summary><strong>[Open/Close] Table of Contents</strong></summary>
 
 
-\<details>
 
-  \<summary>\<strong>[Open/Close] Table of Contents\</strong>\</summary>
+- [CECILia API ](#cecilia-api-)
 
+  - [✨ About](#-about)
 
+  - [🧰 Technology](#-technology)
 
-\- [CECILia API ]\(#cecilia-api-)
+  - [🏗️ Architecture](#️-architecture)
 
-  - [✨ About]\(#-about)
+  - [🚀 Getting Started](#-getting-started)
 
-  - [🧰 Technology]\(#-technology)
+    - [Requirements](#requirements)
 
-  - [🏗️ Architecture]\(#️-architecture)
+    - [Local installation](#local-installation)
 
-  - [🚀 Getting Started]\(#-getting-started)
+  - [🔐 Authentication](#-authentication)
 
-    - [Requirements]\(#requirements)
+  - [📡 Endpoints](#-endpoints)
 
-    - [Local installation]\(#local-installation)
+    - [Service status](#service-status)
 
-  - [🔐 Authentication]\(#-authentication)
+    - [Validate CPF or CNPJ](#validate-cpf-or-cnpj)
 
-  - [📡 Endpoints]\(#-endpoints)
+    - [Atualizar Cobrança de Cliente](#atualizar-cobrança-de-cliente)
 
-    - [Service status]\(#service-status)
+    - [Chatbots](#chatbots)
 
-    - [Validate CPF or CNPJ]\(#validate-cpf-or-cnpj)
+  - [🐳 Docker](#-docker)
 
-    - [Atualizar Cobrança de Cliente]\(#atualizar-cobrança-de-cliente)
+  - [⚙️ Environment Variables](#️-environment-variables)
 
-    - [Chatbots]\(#chatbots)
+  - [☁️ Render Deployment](#️-render-deployment)
 
-  - [🐳 Docker]\(#-docker)
+  - [📁 Project Structure](#-project-structure)
 
-  - [⚙️ Environment Variables]\(#️-environment-variables)
+  - [🔗 Ecosystem Navigation](#-ecosystem-navigation)
 
-  - [☁️ Render Deployment]\(#️-render-deployment)
 
-  - [📁 Project Structure]\(#-project-structure)
 
-  - [🛡️ Security]\(#️-security)
+</details>
 
 
 
-\</details>
+---
 
 
 
-\---
+## ✨ About
 
 
 
-\## ✨ About
+The CECILia API is a FastAPI service used by the CECILia ecosystem. Version `2.0.0` currently provides:
 
 
 
-The CECILia API is a FastAPI service used by the CECILia ecosystem. Version \`2.0.0\` currently provides:
+- CPF validation, including format, length, repeated digits, and check digits.
 
+- Numeric and alphanumeric CNPJ validation, including check digits.
 
+- Bearer token authentication for protected routes.
 
-\- CPF validation, including format, length, repeated digits, and check digits.
+- ReDoc and OpenAPI documentation.
 
-\- Numeric and alphanumeric CNPJ validation, including check digits.
+- SQL Server connection support for data-backed services.
 
-\- Bearer token authentication for protected routes.
+- Sinal Financeiro endpoint for Kanban charge updates.
 
-\- ReDoc and OpenAPI documentation.
+- Chatbot application endpoints for registering attendance events.
 
-\- SQL Server connection support for data-backed services.
+- Containerized execution with Docker and Docker Compose.
 
-\- Sinal Financeiro endpoint for Kanban charge updates.
 
-\- Chatbot application endpoints for registering attendance events.
 
-\- Containerized execution with Docker and Docker Compose.
+## 🧰 Technology
 
 
 
-\## 🧰 Technology
+| Technology | Purpose |
 
+| --- | --- |
 
+| Python 3.10 | Application runtime |
 
-\| Technology | Purpose |
+| FastAPI | HTTP API framework |
 
-\| --- | --- |
+| Pydantic | Request and response validation |
 
-\| Python 3.10 | Application runtime |
+| Uvicorn | ASGI server |
 
-\| FastAPI | HTTP API framework |
+| PyODBC | SQL Server connectivity |
 
-\| Pydantic | Request and response validation |
+| Docker | Containerized deployment |
 
-\| Uvicorn | ASGI server |
+| OpenAPI / ReDoc | Interactive API documentation |
 
-\| PyODBC | SQL Server connectivity |
 
-\| Docker | Containerized deployment |
 
-\| OpenAPI / ReDoc | Interactive API documentation |
+## 🏗️ Architecture
 
 
 
-\## 🏗️ Architecture
-
-
-
-\`\`\`text
+```text
 
 Client
 
   |
 
-  | Authorization: Bearer \<TOKEN>
+  | Authorization: Bearer <TOKEN>
 
   v
 
@@ -174,11 +170,11 @@ FastAPI
 
         +-- SQL Server connection
 
-\`\`\`
+```
 
 
 
-\## 🗺️ API Flow
+## 🗺️ API Flow
 
 <details open>
   <summary><strong>[Open/Close] CECILia API endpoint map</strong></summary>
@@ -241,25 +237,25 @@ flowchart LR
 
 
 
-\### Requirements
+### Requirements
 
 
 
-\- Python \`3.10+\`
+- Python `3.10+`
 
-\- ODBC Driver for SQL Server when database access is used
+- ODBC Driver for SQL Server when database access is used
 
-\- Docker and Docker Compose, optionally
-
-
-
-\### Local installation
+- Docker and Docker Compose, optionally
 
 
 
-\`\`\`bash
+### Local installation
 
-git clone https\://github.com/Sinal-Business/cecilia-api.git
+
+
+```bash
+
+git clone https://github.com/Sinal-Business/cecilia-api.git
 
 cd cecilia-api
 
@@ -267,7 +263,7 @@ cd cecilia-api
 
 python -m venv .venv
 
-\`\`\`
+```
 
 
 
@@ -275,23 +271,23 @@ Activate the virtual environment:
 
 
 
-\`\`\`powershell
+```powershell
 
-*# Windows*
+# Windows
 
-.\\.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 
-\`\`\`
+```
 
 
 
-\`\`\`bash
+```bash
 
-*# Linux or macOS*
+# Linux or macOS
 
 source .venv/bin/activate
 
-\`\`\`
+```
 
 
 
@@ -299,13 +295,13 @@ Install and run:
 
 
 
-\`\`\`bash
+```bash
 
 pip install -r requirements.txt
 
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
-\`\`\`
+```
 
 
 
@@ -313,55 +309,97 @@ The local service will be available at:
 
 
 
-\- API: \`http\://localhost:8000\`
+- API: `http://localhost:8000`
 
-\- ReDoc: \`http\://localhost:8000/docs\`
+- ReDoc: `http://localhost:8000/docs`
 
-\- OpenAPI JSON: \`http\://localhost:8000/openapi.json\`
+- OpenAPI JSON: `http://localhost:8000/openapi.json`
 
-\- OpenAPI YAML: \`http\://localhost:8000/openapi.yaml\`
-
-
-
-\## 🔐 Authentication
+- OpenAPI YAML: `http://localhost:8000/openapi.yaml`
 
 
 
-Protected routes require a bearer token configured in \`TOKEN\` or the optional
-
-\`TOKEN_SECONDARY\` environment variable. This supports token rotation or a
-
-separate integration token without interrupting existing callers.
+## 🔐 Authentication
 
 
 
-\`\`\`http
+Protected routes require a bearer token. `TOKEN` is the primary credential
 
-Authorization: Bearer \<TOKEN>
+and can access every protected endpoint. `TOKEN_SECONDARY` is a restricted
+
+integration credential reserved for the Skeps IA Skill.
+
+
+
+```http
+
+Authorization: Bearer <TOKEN>
 
 Content-Type: application/json
 
-\`\`\`
+```
 
 
 
-Never commit tokens, passwords, connection strings, or local environment files.
+### Skeps IA secondary token
 
 
 
-\## 📡 Endpoints
+[Skeps IA](https://ia.skeps.com.br) is the organization-wide hub for AI use.
+
+The hub is organized into the Sinal and Caucaia platforms, which host the AI
+
+skills available to each business context. The Cecilia API
+
+`TOKEN_SECONDARY` credential is assigned specifically to a Skeps IA Skill.
 
 
 
-\### Service status
+The secondary token follows an exact allowlist and currently grants access only
+
+to these read-only endpoints:
 
 
 
-\`\`\`http
+| Method | Endpoint |
+
+| --- | --- |
+
+| `GET` | `/shopping/flows/hotspot-access` |
+
+| `GET` | `/shopping/flows/parking-access` |
+
+| `GET` | `/shopping/flows/parking-places` |
+
+| `GET` | `/shopping/flows/people-access` |
+
+| `GET` | `/shopping/finance/sales` |
+
+
+
+It cannot access any `POST` endpoint, the `PATCH /adm/client-charge`
+
+endpoint, `GET /health/db`, or any future protected endpoint. New access must
+
+be reviewed and explicitly added to `SECONDARY_TOKEN_ALLOWED_ENDPOINTS` in
+
+`core/auth.py`. Requests outside the allowlist return HTTP `403`.
+
+
+
+## 📡 Endpoints
+
+
+
+### Service status
+
+
+
+```http
 
 GET /
 
-\`\`\`
+```
 
 
 
@@ -369,7 +407,7 @@ Example response:
 
 
 
-\`\`\`json
+```json
 
 {
 
@@ -377,23 +415,23 @@ Example response:
 
 }
 
-\`\`\`
+```
 
 
 
-\### Validate CPF or CNPJ
+### Validate CPF or CNPJ
 
 
 
-\`\`\`http
+```http
 
 POST /validations/document
 
-Authorization: Bearer \<TOKEN>
+Authorization: Bearer <TOKEN>
 
 Content-Type: application/json
 
-\`\`\`
+```
 
 
 
@@ -401,7 +439,7 @@ CPF request:
 
 
 
-\`\`\`json
+```json
 
 {
 
@@ -411,7 +449,7 @@ CPF request:
 
 }
 
-\`\`\`
+```
 
 
 
@@ -419,7 +457,7 @@ CNPJ request:
 
 
 
-\`\`\`json
+```json
 
 {
 
@@ -429,7 +467,7 @@ CNPJ request:
 
 }
 
-\`\`\`
+```
 
 
 
@@ -437,7 +475,7 @@ Response format:
 
 
 
-\`\`\`json
+```json
 
 {
 
@@ -449,7 +487,7 @@ Response format:
 
 }
 
-\`\`\`
+```
 
 
 
@@ -457,47 +495,47 @@ Possible status values:
 
 
 
-\| Document | Status |
+| Document | Status |
 
-\| --- | --- |
+| --- | --- |
 
-\| CPF | \`CPF_VALID\` |
+| CPF | `CPF_VALID` |
 
-\| CPF | \`CPF_INVALID_EMPTY\` |
+| CPF | `CPF_INVALID_EMPTY` |
 
-\| CPF | \`CPF_INVALID_FORMAT\` |
+| CPF | `CPF_INVALID_FORMAT` |
 
-\| CPF | \`CPF_INVALID_LENGTH\` |
+| CPF | `CPF_INVALID_LENGTH` |
 
-\| CPF | \`CPF_INVALID_DIGITS\` |
+| CPF | `CPF_INVALID_DIGITS` |
 
-\| CNPJ | \`CNPJ_VALID\` |
+| CNPJ | `CNPJ_VALID` |
 
-\| CNPJ | \`CNPJ_INVALID_EMPTY\` |
+| CNPJ | `CNPJ_INVALID_EMPTY` |
 
-\| CNPJ | \`CNPJ_INVALID_FORMAT\` |
+| CNPJ | `CNPJ_INVALID_FORMAT` |
 
-\| CNPJ | \`CNPJ_INVALID_LENGTH\` |
+| CNPJ | `CNPJ_INVALID_LENGTH` |
 
-\| CNPJ | \`CNPJ_INVALID_DIGITS\` |
+| CNPJ | `CNPJ_INVALID_DIGITS` |
 
-\| General | \`DOCUMENT_INVALID_TYPE\` |
-
-
-
-\### Atualizar Cobrança de Cliente
+| General | `DOCUMENT_INVALID_TYPE` |
 
 
 
-\`\`\`http
+### Atualizar Cobrança de Cliente
+
+
+
+```http
 
 PATCH /adm/client-charge
 
-Authorization: Bearer \<TOKEN>
+Authorization: Bearer <TOKEN>
 
 Content-Type: application/json
 
-\`\`\`
+```
 
 
 
@@ -505,7 +543,7 @@ Request:
 
 
 
-\`\`\`json
+```json
 
 {
 
@@ -519,21 +557,21 @@ Request:
 
 }
 
-\`\`\`
+```
 
 
 
 The endpoint updates the customer charge fields used by the Financeiro Kanban
 
-module. It locates the customer by \`contato\` and only changes \`status\`,
+module. It locates the customer by `contato` and only changes `status`,
 
-\`resposta\`, and \`dt_projecao_pgto\`. \`status\` is required; \`resposta\` and
+`resposta`, and `dt_projecao_pgto`. `status` is required; `resposta` and
 
-\`dt_projecao_pgto\` are optional. The received \`contato\` may include \`+\`,
+`dt_projecao_pgto` are optional. The received `contato` may include `+`,
 
 spaces, hyphens, or parentheses; the application normalizes it to digits before
 
-matching. \`dt_cobranca\` is filled automatically by the application with the
+matching. `dt_cobranca` is filled automatically by the application with the
 
 current São Paulo date and time whenever the update is processed.
 
@@ -543,7 +581,7 @@ Response:
 
 
 
-\`\`\`json
+```json
 
 {
 
@@ -555,41 +593,41 @@ Response:
 
 }
 
-\`\`\`
+```
 
 
 
-\### Chatbots
+### Chatbots
 
 
 
-All Chatbots endpoints are protected by the same bearer token and accept
+All Chatbots endpoints require the primary `TOKEN` and accept
 
-\`POST\` requests with JSON payloads from the chatbot application. The \`bot\`
+`POST` requests with JSON payloads from the chatbot application. The `bot`
 
-field is required, \`contato\` is accepted for the customer contact, and
+field is required, `contato` is accepted for the customer contact, and
 
-\`dt_interacao\` is filled automatically by the API.
+`dt_interacao` is filled automatically by the API.
 
 
 
-\| Endpoint | Purpose |
+| Endpoint | Purpose |
 
-\| --- | --- |
+| --- | --- |
 
-\| \`POST /chatbots/registrarAtendimento\` | Registrar Atendimento |
+| `POST /chatbots/registrarAtendimento` | Registrar Atendimento |
 
-\| \`POST /chatbots/registrarContatoInicial\` | Registrar Contato Inicial |
+| `POST /chatbots/registrarContatoInicial` | Registrar Contato Inicial |
 
-\| \`POST /chatbots/registrarInteracao\` | Registrar Interação |
+| `POST /chatbots/registrarInteracao` | Registrar Interação |
 
-\| \`POST /chatbots/registrarAvaliacaoAtendimento\` | Registrar Avaliação de Atendimento |
+| `POST /chatbots/registrarAvaliacaoAtendimento` | Registrar Avaliação de Atendimento |
 
-\| \`POST /chatbots/registrarAtendimentoHumano\` | Registrar Atendimento Humano |
+| `POST /chatbots/registrarAtendimentoHumano` | Registrar Atendimento Humano |
 
-\| \`POST /chatbots/registrarContatoFinal\` | Registrar Contato Final |
+| `POST /chatbots/registrarContatoFinal` | Registrar Contato Final |
 
-\| \`POST /chatbots/registrarServico\` | Registrar Serviço |
+| `POST /chatbots/registrarServico` | Registrar Serviço |
 
 
 
@@ -597,7 +635,7 @@ Example request:
 
 
 
-\`\`\`json
+```json
 
 {
 
@@ -609,7 +647,7 @@ Example request:
 
 }
 
-\`\`\`
+```
 
 
 
@@ -617,7 +655,7 @@ Example response:
 
 
 
-\`\`\`json
+```json
 
 {
 
@@ -629,37 +667,41 @@ Example response:
 
 }
 
-\`\`\`
+```
 
 
 
-\### Shopping flows
+### Shopping flows
 
 
 
-The Shopping read endpoints expose the four \`spro_flows\_\*\` datasets. They are
+The Shopping read endpoints expose the four `spro_flows_*` datasets. They are
 
-protected by bearer authentication and use bounded \`limit\` and \`offset\`
+protected by bearer authentication and use bounded `limit` and `offset`
 
-pagination. Event endpoints require both \`start_date\` and \`end_date\`, with an
+pagination. These Shopping routes are the only protected endpoints available to
 
-inclusive period limited to 31 days. \`parking-places\` is a small reference
+the Skeps IA `TOKEN_SECONDARY`. Event endpoints require both `start_date`
+
+and `end_date`, with an
+
+inclusive period limited to 31 days. `parking-places` is a small reference
 
 dataset and does not require a date range.
 
 
 
-\| Nome | Endpoint | Descrição |
+| Nome | Endpoint | Descrição |
 
-\| --- | --- | --- |
+| --- | --- | --- |
 
-\| Acessos Hotspot de Wi-Fi | \`GET /shopping/flows/hotspot-access\` | Registros de acesso com data, localização aproximada e perfil de acesso. |
+| Acessos Hotspot de Wi-Fi | `GET /shopping/flows/hotspot-access` | Registros de acesso com data, localização aproximada e perfil de acesso. |
 
-\| Acessos Estacionamento | \`GET /shopping/flows/parking-access\` | Movimentações de entrada, saída, permanência e pagamento. |
+| Acessos Estacionamento | `GET /shopping/flows/parking-access` | Movimentações de entrada, saída, permanência e pagamento. |
 
-\| Locais Estacionamento | \`GET /shopping/flows/parking-places\` | Locais e tipos associados aos pontos de operação do estacionamento. |
+| Locais Estacionamento | `GET /shopping/flows/parking-places` | Locais e tipos associados aos pontos de operação do estacionamento. |
 
-\| Acessos de Pessoas | \`GET /shopping/flows/people-access\` | Fluxo de pessoas por data e ponto de entrada, com informações contextuais. |
+| Acessos de Pessoas | `GET /shopping/flows/people-access` | Fluxo de pessoas por data e ponto de entrada, com informações contextuais. |
 
 
 
@@ -667,27 +709,27 @@ Example:
 
 
 
-\`\`\`http
+```http
 
 GET /shopping/flows/parking-access?start_date=2026-09-01&end_date=2026-09-30&limit=100&offset=0
 
-Authorization: Bearer \<TOKEN>
+Authorization: Bearer <TOKEN>
 
-\`\`\`
+```
 
 
 
-\`parking-access\` resolves \`eq_entrada\`, \`eq_saida\`, \`eq_pagamento\`, and
+`parking-access` resolves `eq_entrada`, `eq_saida`, `eq_pagamento`, and
 
-\`eq_voucher\` against \`parkingplaces.equipamento\`. The response retains each
+`eq_voucher` against `parkingplaces.equipamento`. The response retains each
 
-raw equipment code and, when a reference exists, adds \`entrada_local\`,
+raw equipment code and, when a reference exists, adds `entrada_local`,
 
-\`saida_local\`, \`pagamento_local\`, or \`voucher_local\` with the equipment,
+`saida_local`, `pagamento_local`, or `voucher_local` with the equipment,
 
 place, and type. This is a left-join relationship, so an access row is not
 
-discarded when its equipment has not yet been registered in \`parkingplaces\`.
+discarded when its equipment has not yet been registered in `parkingplaces`.
 
 
 
@@ -697,55 +739,55 @@ request only the necessary period and avoid logging or redistributing them.
 
 
 
-\### Shopping sales
+### Shopping sales
 
 
 
-\`GET /shopping/finance/sales\` exposes \`spro_financeiro_vendas\` with bearer
+`GET /shopping/finance/sales` exposes `spro_financeiro_vendas` with bearer
 
 authentication, bounded pagination, and a mandatory inclusive date range of at
 
-most 31 days. Exact filters are available for \`loja\`, \`luc\`, \`categoria\`,
+most 31 days. Exact filters are available for `loja`, `luc`, `categoria`,
 
-\`segmento\`, and \`classificacao\`.
+`segmento`, and `classificacao`.
 
 
 
-The endpoint defaults to \`month_end_only=true\`. Historical records can be
+The endpoint defaults to `month_end_only=true`. Historical records can be
 
 cumulative daily snapshots, so summing every date in a month would overstate
 
-sales. Use \`month_end_only=false\` only to inspect the daily cumulative series.
+sales. Use `month_end_only=false` only to inspect the daily cumulative series.
 
 
 
-\`\`\`http
+```http
 
 GET /shopping/finance/sales?start_date=2026-08-01&end_date=2026-08-31&month_end_only=true&limit=100&offset=0
 
-Authorization: Bearer \<TOKEN>
+Authorization: Bearer <TOKEN>
 
-\`\`\`
-
-
-
-\## 🐳 Docker
+```
 
 
 
-Create a local \`.env\` file with the required variables, then run:
+## 🐳 Docker
 
 
 
-\`\`\`bash
+Create a local `.env` file with the required variables, then run:
+
+
+
+```bash
 
 docker compose up --build
 
-\`\`\`
+```
 
 
 
-The API will be exposed at \`http\://localhost:8000\`.
+The API will be exposed at `http://localhost:8000`.
 
 
 
@@ -753,37 +795,37 @@ To stop the service:
 
 
 
-\`\`\`bash
+```bash
 
 docker compose down
 
-\`\`\`
+```
 
 
 
-\## ⚙️ Environment Variables
+## ⚙️ Environment Variables
 
 
 
-\| Variable | Required | Description |
+| Variable | Required | Description |
 
-\| --- | --- | --- |
+| --- | --- | --- |
 
-\| \`TOKEN\` | Yes | Primary bearer token accepted by protected endpoints |
+| `TOKEN` | Yes | Primary bearer token accepted by protected endpoints |
 
-\| \`TOKEN_SECONDARY\` | No | Optional second active bearer token for a separate integration or rotation window |
+| `TOKEN_SECONDARY` | No | Restricted Skeps IA Skill token; only the documented Shopping GET allowlist is accepted |
 
-\| \`DATABASE_URL\` | For database access | Full SQL Server ODBC connection string; preferred for Render |
+| `DATABASE_URL` | For database access | Full SQL Server ODBC connection string; preferred for Render |
 
-\| \`SQL_SERVER_HOST\` | Fallback database access | SQL Server hostname when \`DATABASE_URL\` is not set |
+| `SQL_SERVER_HOST` | Fallback database access | SQL Server hostname when `DATABASE_URL` is not set |
 
-\| \`SQL_SERVER_DB\` | Fallback database access | Database name when \`DATABASE_URL\` is not set |
+| `SQL_SERVER_DB` | Fallback database access | Database name when `DATABASE_URL` is not set |
 
-\| \`SQL_SERVER_USER\` | Fallback database access | Database user when \`DATABASE_URL\` is not set |
+| `SQL_SERVER_USER` | Fallback database access | Database user when `DATABASE_URL` is not set |
 
-\| \`SQL_SERVER_PASSWORD\` | Fallback database access | Database password when \`DATABASE_URL\` is not set |
+| `SQL_SERVER_PASSWORD` | Fallback database access | Database password when `DATABASE_URL` is not set |
 
-\| \`PORT\` | No | HTTP port used by the container; defaults to \`8000\` |
+| `PORT` | No | HTTP port used by the container; defaults to `8000` |
 
 
 
@@ -791,11 +833,11 @@ Example with placeholders only:
 
 
 
-\`\`\`dotenv
+```dotenv
 
 TOKEN=replace-with-a-strong-random-token
 
-TOKEN_SECONDARY=optional-second-strong-random-token
+TOKEN_SECONDARY=replace-with-the-skeps-skill-token
 
 DATABASE_URL=Driver={ODBC Driver 18 for SQL Server};Server=tcp:your-server.database.windows.net,1433;Database=your-database;Uid=your-user;Pwd=your-password;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;
 
@@ -809,11 +851,11 @@ SQL_SERVER_PASSWORD=your-password
 
 PORT=8000
 
-\`\`\`
+```
 
 
 
-\## ☁️ Render Deployment
+## ☁️ Render Deployment
 
 
 
@@ -821,7 +863,7 @@ Deploy this service as a Docker Web Service, not as the native Python runtime.
 
 The Docker image installs Microsoft's SQL Server ODBC driver, which is required
 
-by \`pyodbc\` when \`DATABASE_URL\` uses \`Driver={ODBC Driver 18 for SQL Server}\`.
+by `pyodbc` when `DATABASE_URL` uses `Driver={ODBC Driver 18 for SQL Server}`.
 
 
 
@@ -829,15 +871,15 @@ Recommended Render settings:
 
 
 
-\| Setting | Value |
+| Setting | Value |
 
-\| --- | --- |
+| --- | --- |
 
-\| Runtime | Docker |
+| Runtime | Docker |
 
-\| Dockerfile Path | \`./dockerfile\` |
+| Dockerfile Path | `./dockerfile` |
 
-\| Environment variables | \`TOKEN\`, optional \`TOKEN_SECONDARY\`, \`DATABASE_URL\` |
+| Environment variables | `TOKEN`, optional `TOKEN_SECONDARY`, `DATABASE_URL` |
 
 
 
@@ -847,19 +889,19 @@ fail with:
 
 
 
-\`\`\`text
+```text
 
 Can't open lib 'ODBC Driver 18 for SQL Server' : file not found
 
-\`\`\`
+```
 
 
 
-\## 📁 Project Structure
+## 📁 Project Structure
 
 
 
-\`\`\`text
+```text
 
 cecilia-api/
 
@@ -881,34 +923,27 @@ cecilia-api/
 
 └── requirements.txt      # Python dependencies
 
-\`\`\`
+```
 
 
 
-\## 🛡️ Security
+## 🔗 Ecosystem Navigation
+
+| Project | Responsibility |
+| --- | --- |
+| [cecilia-ai](https://github.com/Sinal-Business/cecilia-ai) | Assistant instructions, knowledge, tools, and conversation flows. |
+| [cecilia-api](https://github.com/Sinal-Business/cecilia-api) | Approved machine integration surface and OpenAPI contract. |
+| [cecilia-app](https://github.com/Sinal-Business/cecilia-app) | Human operational application. |
+| [cecilia-data](https://github.com/Sinal-Business/cecilia-data) | Airflow pipelines, ingestion, transformations, and loads. |
+| [cecilia-datadocs](https://github.com/Sinal-Business/cecilia-datadocs) | Catalog, lineage, ownership, and the [live ecosystem hub](https://cecilia-datadocs.onrender.com). |
+| [cecilia-views](https://github.com/Sinal-Business/cecilia-views) | Fabric workspaces, semantic models, and reports. |
 
 
 
-\- Store production secrets only in the deployment platform's secret manager.
-
-\- Use a long, randomly generated token and rotate it periodically.
-
-\- Do not expose SQL Server directly to the public internet.
-
-\- Restrict database credentials to the minimum required permissions.
-
-\- Review dependency and container image updates before each release.
-
-\- Keep \`openapi.yaml\` synchronized with the FastAPI-generated contract.
+---
 
 
 
-\---
-
-
-
-\<div *align*="center">
-
-Developed for the \<strong>CECILia\</strong> ecosystem by Sinal Business
-
-\</div>
+<div align="center">
+Developed for the <strong>CECILia</strong> ecosystem by Sinal Business
+</div>
