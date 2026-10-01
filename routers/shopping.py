@@ -55,15 +55,30 @@ def _date_where(column: str, start_date: date | None, end_date: date | None):
     return f" WHERE {column} >= ? AND {column} <= ?", [start_date, end_date]
 
 
-def _query_page(sql: str, params: list, limit: int, offset: int):
+def _query_page(
+    sql: str, params: list, limit: int, offset: int, *, operation: str
+):
+    stage = "connect"
     try:
         with get_sqlserver_connection() as conn:
+            stage = "cursor"
             cursor = conn.cursor()
+            stage = "execute"
             cursor.execute(sql, *params, offset, limit)
-            return _rows_as_dicts(cursor)
-    except Exception:
+            stage = "fetch"
+            rows = _rows_as_dicts(cursor)
+            stage = "close"
+        return rows
+    except Exception as exc:
         reference = secrets.token_hex(4).upper()
-        logger.exception("Shopping query failed: reference=%s", reference)
+        # Keep the driver diagnostic on the first line: some log viewers hide
+        # the traceback. Do not log SQL parameters or authorization headers.
+        error = " ".join(str(exc).split())[:2000]
+        logger.exception(
+            "Shopping query failed: reference=%s operation=%s stage=%s "
+            "error_type=%s error=%s limit=%s offset=%s",
+            reference, operation, stage, type(exc).__name__, error, limit, offset,
+        )
         return JSONResponse(
             status_code=503,
             content={
@@ -104,7 +119,7 @@ def list_hotspot_access(
         ORDER BY dt_acesso DESC, dh_acesso DESC, id_lancamento DESC
         OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
     """
-    items = _query_page(sql, params, limit, offset)
+    items = _query_page(sql, params, limit, offset, operation="hotspot_access")
     return items if isinstance(items, JSONResponse) else _page(items, limit, offset)
 
 
@@ -129,7 +144,7 @@ def list_parking_places(
         ORDER BY equipamento
         OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
     """
-    items = _query_page(sql, [], limit, offset)
+    items = _query_page(sql, [], limit, offset, operation="parking_places")
     return items if isinstance(items, JSONResponse) else _page(items, limit, offset)
 
 
@@ -184,7 +199,7 @@ def list_parking_access(
         ORDER BY pa.dt_entrada DESC, pa.dh_entrada DESC, pa.id DESC
         OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
     """
-    items = _query_page(sql, params, limit, offset)
+    items = _query_page(sql, params, limit, offset, operation="parking_access")
     if isinstance(items, JSONResponse):
         return items
     for item in items:
@@ -219,7 +234,7 @@ def list_people_access(
         ORDER BY dt_acesso DESC, entrada, id DESC
         OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
     """
-    items = _query_page(sql, params, limit, offset)
+    items = _query_page(sql, params, limit, offset, operation="people_access")
     return items if isinstance(items, JSONResponse) else _page(items, limit, offset)
 
 
@@ -272,5 +287,5 @@ def list_sales(
         ORDER BY dt_referencia DESC, loja, luc, id
         OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
     """
-    items = _query_page(sql, params, limit, offset)
+    items = _query_page(sql, params, limit, offset, operation="sales")
     return items if isinstance(items, JSONResponse) else _page(items, limit, offset)
