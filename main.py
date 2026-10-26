@@ -51,9 +51,11 @@ API services for Sinal Business.
 Send the assigned credential as `Authorization: Bearer TOKEN`.
 
 - `TOKEN` is the primary credential and can access every protected endpoint.
-- `TOKEN_SECONDARY` is reserved for the Skeps IA Skill at
+- `TOKEN_SECONDARY` is the Skeps AI credential used by the
+  `CECILia (Sinal Business)` connector in the
+  `Analise de Dados (Sinal Business)` Skill at
   [ia.skeps.com.br](https://ia.skeps.com.br). It can access only the five
-  documented read-only Shopping endpoints.
+  documented read-only data endpoints.
 - The Skeps token cannot call `POST`, `PATCH`, or any protected endpoint that
   is not explicitly allowlisted.
 
@@ -64,10 +66,11 @@ Current Skeps allowlist:
 - `GET /shopping/flows/parking-places`
 - `GET /shopping/flows/people-access`
 - `GET /shopping/finance/sales`
+- `GET /sinal/finance/cash-transactions`
 
-Skeps IA is the organization-wide AI hub, organized into the Sinal and Caucaia
-platforms. New endpoints are denied to its token until they are reviewed and
-added to the allowlist.
+Skeps AI is the organization-wide AI hub, organized into the Sinal and Caucaia
+platforms. New endpoints are denied to this connector until they are reviewed
+and added to the allowlist.
 
 ```http
 Authorization: Bearer TOKEN

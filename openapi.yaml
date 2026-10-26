@@ -1,7 +1,20 @@
 openapi: 3.1.0
 info:
   title: CECILia API
-  description: "\nAPI services for Sinal Business.\n\n### Authentication\n\nSend the assigned credential as `Authorization: Bearer TOKEN`.\n\n- `TOKEN` is the primary credential and can access every protected endpoint.\n- `TOKEN_SECONDARY` is reserved for the Skeps IA Skill at\n  [ia.skeps.com.br](https://ia.skeps.com.br). It can access only the five\n  documented read-only Shopping endpoints.\n- The Skeps token cannot call `POST`, `PATCH`, or any protected endpoint that\n  is not explicitly allowlisted.\n\nCurrent Skeps allowlist:\n\n- `GET /shopping/flows/hotspot-access`\n- `GET /shopping/flows/parking-access`\n- `GET /shopping/flows/parking-places`\n- `GET /shopping/flows/people-access`\n- `GET /shopping/finance/sales`\n\nSkeps IA is the organization-wide AI hub, organized into the Sinal and Caucaia\nplatforms. New endpoints are denied to its token until they are reviewed and\nadded to the allowlist.\n\n```http\nAuthorization: Bearer TOKEN\nContent-Type: application/json\n```\n"
+  description: "\nAPI services for Sinal Business.\n\n### Authentication\n\nSend the\
+    \ assigned credential as `Authorization: Bearer TOKEN`.\n\n- `TOKEN` is the primary\
+    \ credential and can access every protected endpoint.\n- `TOKEN_SECONDARY` is\
+    \ the Skeps AI credential used by the\n  `CECILia (Sinal Business)` connector\
+    \ in the\n  `Analise de Dados (Sinal Business)` Skill at\n  [ia.skeps.com.br](https://ia.skeps.com.br).\
+    \ It can access only the five\n  documented read-only data endpoints.\n- The Skeps\
+    \ token cannot call `POST`, `PATCH`, or any protected endpoint that\n  is not\
+    \ explicitly allowlisted.\n\nCurrent Skeps allowlist:\n\n- `GET /shopping/flows/hotspot-access`\n\
+    - `GET /shopping/flows/parking-access`\n- `GET /shopping/flows/parking-places`\n\
+    - `GET /shopping/flows/people-access`\n- `GET /shopping/finance/sales`\n- `GET\
+    \ /sinal/finance/cash-transactions`\n\nSkeps AI is the organization-wide AI hub,\
+    \ organized into the Sinal and Caucaia\nplatforms. New endpoints are denied to\
+    \ this connector until they are reviewed\nand added to the allowlist.\n\n```http\n\
+    Authorization: Bearer TOKEN\nContent-Type: application/json\n```\n"
   version: 2.0.0
 servers:
 - url: https://sinalbusiness-cecilia-api.onrender.com
@@ -16,17 +29,20 @@ paths:
 
         ### Regras aplicadas
 
-        - O valor deve conter entre 2 e 60 caracteres após a remoção de espaços nas extremidades
+        - O valor deve conter entre 2 e 60 caracteres após a remoção de espaços nas
+        extremidades
 
         - Não pode conter números, CPF, CNPJ, endereço de e-mail ou link
 
         - Aceita letras, espaços, apóstrofos e hífens
 
-        - Cada palavra deve ter pelo menos 2 caracteres, exceto os conectores `da`, `de`, `do`, `das`, `dos` e `e`
+        - Cada palavra deve ter pelo menos 2 caracteres, exceto os conectores `da`,
+        `de`, `do`, `das`, `dos` e `e`
 
         - Deve conter pelo menos uma palavra de nome além dos conectores aceitos
 
-        - Rejeita palavras relacionadas a solicitações, como boleto, pagamento, contrato, suporte e manutenção
+        - Rejeita palavras relacionadas a solicitações, como boleto, pagamento, contrato,
+        suporte e manutenção
 
         - Rejeita textos que aparentem ser frases em vez de nomes
 
@@ -90,7 +106,8 @@ paths:
 
         - `status`: status técnico da validação.
 
-        - `notes`: mensagem pronta para retorno ao usuário. Retorna `null` quando o documento é válido.
+        - `notes`: mensagem pronta para retorno ao usuário. Retorna `null` quando
+        o documento é válido.
 
 
         ### Regras aplicadas
@@ -143,7 +160,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ValidateDocumentInput'
-              description: Dados para validação do documento. Informe o tipo do documento e o valor recebido pela aplicação de origem
+              description: Dados para validação do documento. Informe o tipo do documento
+                e o valor recebido pela aplicação de origem
         required: true
       responses:
         '200':
@@ -164,13 +182,15 @@ paths:
                   value:
                     valid_doc: false
                     status: CPF_INVALID_FORMAT
-                    notes: Parece que você enviou um CPF com letras, símbolos ou espaços. Por favor, me envie apenas os números 😊
+                    notes: Parece que você enviou um CPF com letras, símbolos ou espaços.
+                      Por favor, me envie apenas os números 😊
                 cpf_quantidade_invalida:
                   summary: CPF com quantidade inválida
                   value:
                     valid_doc: false
                     status: CPF_INVALID_LENGTH
-                    notes: O CPF precisa ter exatamente 11 dígitos. Você pode por favor conferir e me mandar novamente? 😊
+                    notes: O CPF precisa ter exatamente 11 dígitos. Você pode por
+                      favor conferir e me mandar novamente? 😊
                 cnpj_valido:
                   summary: CNPJ válido
                   value:
@@ -182,13 +202,15 @@ paths:
                   value:
                     valid_doc: false
                     status: CNPJ_INVALID_FORMAT
-                    notes: Parece que você enviou um CNPJ com símbolos, pontuação ou espaços. Por favor, me envie apenas os dígitos 😊
+                    notes: Parece que você enviou um CNPJ com símbolos, pontuação
+                      ou espaços. Por favor, me envie apenas os dígitos 😊
                 tipo_invalido:
                   summary: Tipo de documento inválido
                   value:
                     valid_doc: false
                     status: DOCUMENT_INVALID_TYPE
-                    notes: Ocorreu um erro na autenticação, por favor envie falar com humano no chat 😊
+                    notes: Ocorreu um erro na autenticação, por favor envie falar
+                      com humano no chat 😊
         '403':
           description: Token inválido ou ausente
         '422':
@@ -227,7 +249,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateClientChargeInput'
-              description: Dados recebidos via webhook para atualizar a cobrança do cliente
+              description: Dados recebidos via webhook para atualizar a cobrança do
+                cliente
         required: true
       responses:
         '200':
@@ -260,7 +283,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarAtendimentoPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -296,7 +322,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarContatoInicialPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -333,7 +362,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarInteracaoPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -363,14 +395,18 @@ paths:
       tags:
       - Chatbots
       summary: Registrar Avaliação de Atendimento
-      description: Registra avaliação de atendimento enviada pelo cliente ao final do atendimento.
+      description: Registra avaliação de atendimento enviada pelo cliente ao final
+        do atendimento.
       operationId: registrarAvaliacaoAtendimento
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarAvaliacaoAtendimentoPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -400,14 +436,18 @@ paths:
       tags:
       - Chatbots
       summary: Registrar Atendimento Humano
-      description: Registra o momento em que o cliente é encaminhado para atendimento humano.
+      description: Registra o momento em que o cliente é encaminhado para atendimento
+        humano.
       operationId: registrarAtendimentoHumano
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarAtendimentoHumanoPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -437,14 +477,18 @@ paths:
       tags:
       - Chatbots
       summary: Registrar Contato Final
-      description: Registra o encerramento do atendimento e se a demanda do cliente foi resolvida.
+      description: Registra o encerramento do atendimento e se a demanda do cliente
+        foi resolvida.
       operationId: registrarContatoFinal
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarContatoFinalPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -473,14 +517,18 @@ paths:
       tags:
       - Chatbots
       summary: Registrar Serviço
-      description: Registra solicitações de serviço durante o atendimento do cliente (e.g. segunda via de boleto, registro de ocorrências).
+      description: Registra solicitações de serviço durante o atendimento do cliente
+        (e.g. segunda via de boleto, registro de ocorrências).
       operationId: registrarServico
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarServicoPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os
+                campos id_cliente e bot são obrigatórios; contato e os dados específicos
+                do evento são opcionais; dt_interacao é preenchido automaticamente
+                pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -509,7 +557,8 @@ paths:
       tags:
       - Shopping
       summary: Acessos Hotspot de Wi-Fi
-      description: Apresenta registros de acesso ao Wi-Fi, com informações de data, localização aproximada e perfil de acesso. Permite filtros por período.
+      description: Apresenta registros de acesso ao Wi-Fi, com informações de data,
+        localização aproximada e perfil de acesso. Permite filtros por período.
       operationId: listarAcessosHotspotShopping
       security:
       - HTTPBearer: []
@@ -568,7 +617,9 @@ paths:
       tags:
       - Shopping
       summary: Locais Estacionamento
-      description: Apresenta os locais e tipos associados aos pontos de operação do estacionamento. Pode ser usado para identificar os locais informados nos registros de acesso.
+      description: Apresenta os locais e tipos associados aos pontos de operação do
+        estacionamento. Pode ser usado para identificar os locais informados nos registros
+        de acesso.
       operationId: listarLocaisEquipamentosEstacionamento
       security:
       - HTTPBearer: []
@@ -609,7 +660,9 @@ paths:
       tags:
       - Shopping
       summary: Acessos Estacionamento
-      description: Apresenta movimentações do estacionamento, incluindo entrada, saída, permanência e informações de pagamento. Quando disponível, cada evento inclui a identificação do local correspondente.
+      description: Apresenta movimentações do estacionamento, incluindo entrada, saída,
+        permanência e informações de pagamento. Quando disponível, cada evento inclui
+        a identificação do local correspondente.
       operationId: listarAcessosEstacionamento
       security:
       - HTTPBearer: []
@@ -668,7 +721,8 @@ paths:
       tags:
       - Shopping
       summary: Acessos de Pessoas
-      description: Apresenta registros de fluxo de pessoas por data e ponto de entrada, com informações contextuais disponíveis para o período.
+      description: Apresenta registros de fluxo de pessoas por data e ponto de entrada,
+        com informações contextuais disponíveis para o período.
       operationId: listarContagemPessoasShopping
       security:
       - HTTPBearer: []
@@ -727,7 +781,9 @@ paths:
       tags:
       - Shopping
       summary: Vendas por Loja
-      description: Apresenta vendas acumuladas por loja, LUC e data de referencia. Por padrao, retorna somente snapshots de fechamento mensal para evitar a soma indevida dos valores acumulados registrados diariamente.
+      description: Apresenta vendas acumuladas por loja, LUC e data de referencia.
+        Por padrao, retorna somente snapshots de fechamento mensal para evitar a soma
+        indevida dos valores acumulados registrados diariamente.
       operationId: listarVendasShopping
       security:
       - HTTPBearer: []
@@ -845,7 +901,8 @@ paths:
       tags:
       - Sinal
       summary: Movimentacoes Financeiras (Caixa)
-      description: Consulta paginada com periodo de pagamento obrigatorio e filtros financeiros opcionais.
+      description: Consulta paginada com periodo de pagamento obrigatorio e filtros
+        financeiros opcionais.
       operationId: listarMovimentacoesFinanceirasCaixa
       security:
       - HTTPBearer: []
@@ -1042,7 +1099,8 @@ paths:
       tags:
       - Sinal
       summary: Criar Movimentacoes Financeiras (Caixa)
-      description: Insere de 1 a 500 registros. A API gera lancamentos sequenciais a partir do maior valor existente, sob bloqueio transacional.
+      description: Insere de 1 a 500 registros. A API gera lancamentos sequenciais
+        a partir do maior valor existente, sob bloqueio transacional.
       operationId: criarMovimentacoesFinanceirasCaixa
       security:
       - HTTPBearer: []
@@ -1070,7 +1128,10 @@ paths:
       tags:
       - Sinal
       summary: Atualizar Movimentacao Financeira (Caixa)
-      description: Atualiza somente campos de classificacao autorizados. Para alterar valores, datas, empresa, filial, titulo ou identificadores, solicite a alteracao ao responsavel tecnico. ult_alteracao e preenchida automaticamente no horario de Brasilia.
+      description: Atualiza somente campos de classificacao autorizados. Para alterar
+        valores, datas, empresa, filial, titulo ou identificadores, solicite a alteracao
+        ao responsavel tecnico. ult_alteracao e preenchida automaticamente no horario
+        de Brasilia.
       operationId: atualizarMovimentacaoFinanceiraCaixa
       security:
       - HTTPBearer: []
@@ -2629,7 +2690,8 @@ components:
           maxLength: 40
           minLength: 1
           title: Contato
-          description: Valor usado para localizar a cobrança; aceita + e pontuação, mas será normalizado para números
+          description: Valor usado para localizar a cobrança; aceita + e pontuação,
+            mas será normalizado para números
           examples:
           - '+5521999999999'
         status:
@@ -2691,13 +2753,15 @@ components:
           - cpf
           - cnpj
           title: Tipo
-          description: Tipo de documento que será validado. Use 'cpf' para CPF ou 'cnpj' para CNPJ
+          description: Tipo de documento que será validado. Use 'cpf' para CPF ou
+            'cnpj' para CNPJ
           examples:
           - cpf
         valor:
           type: string
           title: Valor
-          description: Documento a ser validado exatamente como foi recebido pela aplicação de origem
+          description: Documento a ser validado exatamente como foi recebido pela
+            aplicação de origem
           examples:
           - '12345678909'
       type: object
@@ -2730,7 +2794,8 @@ components:
       properties:
         nome:
           title: Nome
-          description: Nome a ser validado, exatamente como foi recebido pelo sistema de origem
+          description: Nome a ser validado, exatamente como foi recebido pelo sistema
+            de origem
           examples:
           - Maria da Silva
       type: object
@@ -2759,7 +2824,8 @@ components:
         motivo_nome_invalido:
           type: string
           title: Motivo Nome Invalido
-          description: Motivo da rejeição; retorna uma string vazia quando o nome é válido
+          description: Motivo da rejeição; retorna uma string vazia quando o nome
+            é válido
       type: object
       required:
       - nome_original

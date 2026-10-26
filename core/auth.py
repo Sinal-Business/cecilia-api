@@ -15,6 +15,7 @@ SECONDARY_TOKEN_ALLOWED_ENDPOINTS = frozenset(
         ("GET", "/shopping/flows/parking-places"),
         ("GET", "/shopping/flows/people-access"),
         ("GET", "/shopping/finance/sales"),
+        ("GET", "/sinal/finance/cash-transactions"),
     }
 )
 

@@ -236,7 +236,7 @@ Protected routes require a bearer token. `TOKEN` is the primary credential
 
 and can access every protected endpoint. `TOKEN_SECONDARY` is a restricted
 
-integration credential reserved for the Skeps IA Skill.
+integration credential reserved for the Skeps AI connector described below.
 
 ```http
 
@@ -246,27 +246,28 @@ Content-Type: application/json
 
 ```
 
-### Skeps IA secondary token
+### Skeps AI secondary token
 
-[Skeps IA](https://ia.skeps.com.br) is the organization-wide hub for AI use.
+[Skeps AI](https://ia.skeps.com.br) is the organization-wide hub for AI use.
 
 The hub is organized into the Sinal and Caucaia platforms, which host the AI
 
-skills available to each business context. The Cecilia API
-
-`TOKEN_SECONDARY` credential is assigned specifically to a Skeps IA Skill.
+skills available to each business context. `TOKEN_SECONDARY` is assigned to
+the **CECILia (Sinal Business)** connector used by the
+**Analise de Dados (Sinal Business)** Skill.
 
 The secondary token follows an exact allowlist and currently grants access only
 
 to these read-only endpoints:
 
-| Method | Endpoint |
-| --- | --- |
-| `GET` | `/shopping/flows/hotspot-access` |
-| `GET` | `/shopping/flows/parking-access` |
-| `GET` | `/shopping/flows/parking-places` |
-| `GET` | `/shopping/flows/people-access` |
-| `GET` | `/shopping/finance/sales` |
+| Method | Endpoint | Data available to the Skill |
+| --- | --- | --- |
+| `GET` | `/shopping/flows/hotspot-access` | Wi-Fi hotspot access records by date and location. |
+| `GET` | `/shopping/flows/parking-access` | Parking entries, exits, stay duration, and payment context. |
+| `GET` | `/shopping/flows/parking-places` | Parking locations and equipment types used to interpret access records. |
+| `GET` | `/shopping/flows/people-access` | People-flow counts by date and entrance point. |
+| `GET` | `/shopping/finance/sales` | Store sales by reference date, store, and LUC. |
+| `GET` | `/sinal/finance/cash-transactions` | Financial cash movements within a mandatory payment-date range. |
 
 It cannot access any `POST` endpoint, the `PATCH /adm/client-charge`
 
@@ -545,7 +546,8 @@ periodo maximo de 31 dias. `due_start_date` e `due_end_date` filtram
 
 O PATCH nao altera valores, datas, empresa, filial, titulo ou identificadores.
 Essas mudancas devem ser solicitadas ao responsavel tecnico. Todos os tres
-metodos exigem o `TOKEN` primario; `TOKEN_SECONDARY` nao possui acesso.
+metodos exigem autenticacao. `TOKEN_SECONDARY` possui acesso somente ao GET;
+POST e PATCH exigem o `TOKEN` primario.
 
 ### Shopping sales
 
@@ -596,7 +598,7 @@ docker compose down
 | Variable | Required | Description |
 | --- | --- | --- |
 | `TOKEN` | Yes | Primary bearer token accepted by protected endpoints |
-| `TOKEN_SECONDARY` | No | Restricted Skeps IA Skill token; only the documented Shopping GET allowlist is accepted |
+| `TOKEN_SECONDARY` | No | Restricted Skeps AI Skill token; only the documented read-only GET allowlist is accepted |
 | `DATABASE_URL` | For database access | Full SQL Server ODBC connection string; preferred for Render |
 | `SQL_SERVER_HOST` | Fallback database access | SQL Server hostname when `DATABASE_URL` is not set |
 | `SQL_SERVER_DB` | Fallback database access | Database name when `DATABASE_URL` is not set |
