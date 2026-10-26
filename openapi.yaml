@@ -1,23 +1,7 @@
 openapi: 3.1.0
 info:
   title: CECILia API
-  description: |
-    API services for Sinal Business.
-
-    `TOKEN` is the primary credential and can access every protected endpoint.
-    `TOKEN_SECONDARY` belongs to the Skeps IA Skill at https://ia.skeps.com.br,
-    the organization-wide AI hub organized into the Sinal and Caucaia platforms.
-
-    The secondary token is restricted to the documented read-only Shopping
-    endpoint allowlist. It cannot call POST, PATCH, `/health/db`, or any future
-    protected endpoint unless that endpoint is explicitly reviewed and added.
-
-    Current Skeps allowlist:
-    - `GET /shopping/flows/hotspot-access`
-    - `GET /shopping/flows/parking-access`
-    - `GET /shopping/flows/parking-places`
-    - `GET /shopping/flows/people-access`
-    - `GET /shopping/finance/sales`
+  description: "\nAPI services for Sinal Business.\n\n### Authentication\n\nSend the assigned credential as `Authorization: Bearer TOKEN`.\n\n- `TOKEN` is the primary credential and can access every protected endpoint.\n- `TOKEN_SECONDARY` is reserved for the Skeps IA Skill at\n  [ia.skeps.com.br](https://ia.skeps.com.br). It can access only the five\n  documented read-only Shopping endpoints.\n- The Skeps token cannot call `POST`, `PATCH`, or any protected endpoint that\n  is not explicitly allowlisted.\n\nCurrent Skeps allowlist:\n\n- `GET /shopping/flows/hotspot-access`\n- `GET /shopping/flows/parking-access`\n- `GET /shopping/flows/parking-places`\n- `GET /shopping/flows/people-access`\n- `GET /shopping/finance/sales`\n\nSkeps IA is the organization-wide AI hub, organized into the Sinal and Caucaia\nplatforms. New endpoints are denied to its token until they are reviewed and\nadded to the allowlist.\n\n```http\nAuthorization: Bearer TOKEN\nContent-Type: application/json\n```\n"
   version: 2.0.0
 servers:
 - url: https://sinalbusiness-cecilia-api.onrender.com
@@ -32,20 +16,17 @@ paths:
 
         ### Regras aplicadas
 
-        - O valor deve conter entre 2 e 60 caracteres após a remoção de espaços nas
-        extremidades
+        - O valor deve conter entre 2 e 60 caracteres após a remoção de espaços nas extremidades
 
         - Não pode conter números, CPF, CNPJ, endereço de e-mail ou link
 
         - Aceita letras, espaços, apóstrofos e hífens
 
-        - Cada palavra deve ter pelo menos 2 caracteres, exceto os conectores `da`,
-        `de`, `do`, `das`, `dos` e `e`
+        - Cada palavra deve ter pelo menos 2 caracteres, exceto os conectores `da`, `de`, `do`, `das`, `dos` e `e`
 
         - Deve conter pelo menos uma palavra de nome além dos conectores aceitos
 
-        - Rejeita palavras relacionadas a solicitações, como boleto, pagamento, contrato,
-        suporte e manutenção
+        - Rejeita palavras relacionadas a solicitações, como boleto, pagamento, contrato, suporte e manutenção
 
         - Rejeita textos que aparentem ser frases em vez de nomes
 
@@ -109,8 +90,7 @@ paths:
 
         - `status`: status técnico da validação.
 
-        - `notes`: mensagem pronta para retorno ao usuário. Retorna `null` quando
-        o documento é válido.
+        - `notes`: mensagem pronta para retorno ao usuário. Retorna `null` quando o documento é válido.
 
 
         ### Regras aplicadas
@@ -163,8 +143,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ValidateDocumentInput'
-              description: Dados para validação do documento. Informe o tipo do documento
-                e o valor recebido pela aplicação de origem
+              description: Dados para validação do documento. Informe o tipo do documento e o valor recebido pela aplicação de origem
         required: true
       responses:
         '200':
@@ -185,15 +164,13 @@ paths:
                   value:
                     valid_doc: false
                     status: CPF_INVALID_FORMAT
-                    notes: Parece que você enviou um CPF com letras, símbolos ou espaços.
-                      Por favor, me envie apenas os números 😊
+                    notes: Parece que você enviou um CPF com letras, símbolos ou espaços. Por favor, me envie apenas os números 😊
                 cpf_quantidade_invalida:
                   summary: CPF com quantidade inválida
                   value:
                     valid_doc: false
                     status: CPF_INVALID_LENGTH
-                    notes: O CPF precisa ter exatamente 11 dígitos. Você pode por
-                      favor conferir e me mandar novamente? 😊
+                    notes: O CPF precisa ter exatamente 11 dígitos. Você pode por favor conferir e me mandar novamente? 😊
                 cnpj_valido:
                   summary: CNPJ válido
                   value:
@@ -205,15 +182,13 @@ paths:
                   value:
                     valid_doc: false
                     status: CNPJ_INVALID_FORMAT
-                    notes: Parece que você enviou um CNPJ com símbolos, pontuação
-                      ou espaços. Por favor, me envie apenas os dígitos 😊
+                    notes: Parece que você enviou um CNPJ com símbolos, pontuação ou espaços. Por favor, me envie apenas os dígitos 😊
                 tipo_invalido:
                   summary: Tipo de documento inválido
                   value:
                     valid_doc: false
                     status: DOCUMENT_INVALID_TYPE
-                    notes: Ocorreu um erro na autenticação, por favor envie falar
-                      com humano no chat 😊
+                    notes: Ocorreu um erro na autenticação, por favor envie falar com humano no chat 😊
         '403':
           description: Token inválido ou ausente
         '422':
@@ -252,8 +227,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateClientChargeInput'
-              description: Dados recebidos via webhook para atualizar a cobrança do
-                cliente
+              description: Dados recebidos via webhook para atualizar a cobrança do cliente
         required: true
       responses:
         '200':
@@ -286,10 +260,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarAtendimentoPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os
-                campos id_cliente e bot são obrigatórios; contato e os dados específicos
-                do evento são opcionais; dt_interacao é preenchido automaticamente
-                pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -325,10 +296,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarContatoInicialPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os
-                campos id_cliente e bot são obrigatórios; contato e os dados específicos
-                do evento são opcionais; dt_interacao é preenchido automaticamente
-                pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -365,10 +333,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarInteracaoPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os
-                campos id_cliente e bot são obrigatórios; contato e os dados específicos
-                do evento são opcionais; dt_interacao é preenchido automaticamente
-                pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -398,18 +363,14 @@ paths:
       tags:
       - Chatbots
       summary: Registrar Avaliação de Atendimento
-      description: Registra avaliação de atendimento enviada pelo cliente ao final
-        do atendimento.
+      description: Registra avaliação de atendimento enviada pelo cliente ao final do atendimento.
       operationId: registrarAvaliacaoAtendimento
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarAvaliacaoAtendimentoPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os
-                campos id_cliente e bot são obrigatórios; contato e os dados específicos
-                do evento são opcionais; dt_interacao é preenchido automaticamente
-                pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -439,18 +400,14 @@ paths:
       tags:
       - Chatbots
       summary: Registrar Atendimento Humano
-      description: Registra o momento em que o cliente é encaminhado para atendimento
-        humano.
+      description: Registra o momento em que o cliente é encaminhado para atendimento humano.
       operationId: registrarAtendimentoHumano
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarAtendimentoHumanoPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os
-                campos id_cliente e bot são obrigatórios; contato e os dados específicos
-                do evento são opcionais; dt_interacao é preenchido automaticamente
-                pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -480,18 +437,14 @@ paths:
       tags:
       - Chatbots
       summary: Registrar Contato Final
-      description: Registra o encerramento do atendimento e se a demanda do cliente
-        foi resolvida.
+      description: Registra o encerramento do atendimento e se a demanda do cliente foi resolvida.
       operationId: registrarContatoFinal
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarContatoFinalPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os
-                campos id_cliente e bot são obrigatórios; contato e os dados específicos
-                do evento são opcionais; dt_interacao é preenchido automaticamente
-                pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -520,18 +473,14 @@ paths:
       tags:
       - Chatbots
       summary: Registrar Serviço
-      description: Registra solicitações de serviço durante o atendimento do cliente
-        (e.g. segunda via de boleto, registro de ocorrências).
+      description: Registra solicitações de serviço durante o atendimento do cliente (e.g. segunda via de boleto, registro de ocorrências).
       operationId: registrarServico
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarServicoPayload'
-              description: Dados do evento enviados pela aplicação de chatbot. Os
-                campos id_cliente e bot são obrigatórios; contato e os dados específicos
-                do evento são opcionais; dt_interacao é preenchido automaticamente
-                pela API.
+              description: Dados do evento enviados pela aplicação de chatbot. Os campos id_cliente e bot são obrigatórios; contato e os dados específicos do evento são opcionais; dt_interacao é preenchido automaticamente pela API.
               examples:
               - id_cliente: '10346316758'
                 contato: '+5521999999999'
@@ -560,8 +509,7 @@ paths:
       tags:
       - Shopping
       summary: Acessos Hotspot de Wi-Fi
-      description: Apresenta registros de acesso ao Wi-Fi, com informações de data,
-        localização aproximada e perfil de acesso. Permite filtros por período.
+      description: Apresenta registros de acesso ao Wi-Fi, com informações de data, localização aproximada e perfil de acesso. Permite filtros por período.
       operationId: listarAcessosHotspotShopping
       security:
       - HTTPBearer: []
@@ -620,9 +568,7 @@ paths:
       tags:
       - Shopping
       summary: Locais Estacionamento
-      description: Apresenta os locais e tipos associados aos pontos de operação do
-        estacionamento. Pode ser usado para identificar os locais informados nos registros
-        de acesso.
+      description: Apresenta os locais e tipos associados aos pontos de operação do estacionamento. Pode ser usado para identificar os locais informados nos registros de acesso.
       operationId: listarLocaisEquipamentosEstacionamento
       security:
       - HTTPBearer: []
@@ -663,9 +609,7 @@ paths:
       tags:
       - Shopping
       summary: Acessos Estacionamento
-      description: Apresenta movimentações do estacionamento, incluindo entrada, saída,
-        permanência e informações de pagamento. Quando disponível, cada evento inclui
-        a identificação do local correspondente.
+      description: Apresenta movimentações do estacionamento, incluindo entrada, saída, permanência e informações de pagamento. Quando disponível, cada evento inclui a identificação do local correspondente.
       operationId: listarAcessosEstacionamento
       security:
       - HTTPBearer: []
@@ -724,8 +668,7 @@ paths:
       tags:
       - Shopping
       summary: Acessos de Pessoas
-      description: Apresenta registros de fluxo de pessoas por data e ponto de entrada,
-        com informações contextuais disponíveis para o período.
+      description: Apresenta registros de fluxo de pessoas por data e ponto de entrada, com informações contextuais disponíveis para o período.
       operationId: listarContagemPessoasShopping
       security:
       - HTTPBearer: []
@@ -784,9 +727,7 @@ paths:
       tags:
       - Shopping
       summary: Vendas por Loja
-      description: Apresenta vendas acumuladas por loja, LUC e data de referencia.
-        Por padrao, retorna somente snapshots de fechamento mensal para evitar a soma
-        indevida dos valores acumulados registrados diariamente.
+      description: Apresenta vendas acumuladas por loja, LUC e data de referencia. Por padrao, retorna somente snapshots de fechamento mensal para evitar a soma indevida dos valores acumulados registrados diariamente.
       operationId: listarVendasShopping
       security:
       - HTTPBearer: []
@@ -899,6 +840,266 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /sinal/finance/cash-transactions:
+    get:
+      tags:
+      - Sinal
+      summary: Movimentacoes Financeiras (Caixa)
+      description: Consulta paginada com periodo de pagamento obrigatorio e filtros financeiros opcionais.
+      operationId: listarMovimentacoesFinanceirasCaixa
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: start_date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          description: Data inicial inclusiva de pagamento
+          title: Start Date
+        description: Data inicial inclusiva de pagamento
+      - name: end_date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          description: Data final inclusiva de pagamento; maximo de 31 dias
+          title: End Date
+        description: Data final inclusiva de pagamento; maximo de 31 dias
+      - name: due_start_date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          description: Data inicial inclusiva de vencimento
+          title: Due Start Date
+        description: Data inicial inclusiva de vencimento
+      - name: due_end_date
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          description: Data final inclusiva de vencimento
+          title: Due End Date
+        description: Data final inclusiva de vencimento
+      - name: empresa
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 70
+          - type: 'null'
+          title: Empresa
+      - name: filial
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 70
+          - type: 'null'
+          title: Filial
+      - name: co_contabilrecla
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Co Contabilrecla
+      - name: cc_analiticorecla
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 100
+          - type: 'null'
+          title: Cc Analiticorecla
+      - name: fc_codigo
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 15
+          - type: 'null'
+          title: Fc Codigo
+      - name: req_original
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 6
+          - type: 'null'
+          title: Req Original
+      - name: pro_codigo
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 100
+          - type: 'null'
+          title: Pro Codigo
+      - name: cb_codigo
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 10
+          - type: 'null'
+          title: Cb Codigo
+      - name: fcx_sintetico
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 11
+          - type: 'null'
+          title: Fcx Sintetico
+      - name: fcx_analitico
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 20
+          - type: 'null'
+          title: Fcx Analitico
+      - name: fcx_dretipo
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 20
+          - type: 'null'
+          title: Fcx Dretipo
+      - name: fcx_subgrupo
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 30
+          - type: 'null'
+          title: Fcx Subgrupo
+      - name: fcx_variacao
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 27
+          - type: 'null'
+          title: Fcx Variacao
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          minimum: 1
+          default: 100
+          title: Limit
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 10000
+          minimum: 0
+          default: 0
+          title: Offset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialCashPage'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Sinal
+      summary: Criar Movimentacoes Financeiras (Caixa)
+      description: Insere de 1 a 500 registros. A API gera lancamentos sequenciais a partir do maior valor existente, sob bloqueio transacional.
+      operationId: criarMovimentacoesFinanceirasCaixa
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialCashBulkCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialCashBulkCreateResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sinal/finance/cash-transactions/{lancamento}:
+    patch:
+      tags:
+      - Sinal
+      summary: Atualizar Movimentacao Financeira (Caixa)
+      description: Atualiza somente campos de classificacao autorizados. Para alterar valores, datas, empresa, filial, titulo ou identificadores, solicite a alteracao ao responsavel tecnico. ult_alteracao e preenchida automaticamente no horario de Brasilia.
+      operationId: atualizarMovimentacaoFinanceiraCaixa
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: lancamento
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Lancamento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialCashPatch'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialCashPatchResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /health/db:
     get:
       tags:
@@ -946,6 +1147,705 @@ components:
       - inserted_count
       - event
       title: ChatbotRecordResponse
+    FinancialCashBulkCreate:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/FinancialCashCreate'
+          type: array
+          maxItems: 500
+          minItems: 1
+          title: Items
+      type: object
+      required:
+      - items
+      title: FinancialCashBulkCreate
+    FinancialCashBulkCreateResponse:
+      properties:
+        ok:
+          type: boolean
+          title: Ok
+        inserted_count:
+          type: integer
+          title: Inserted Count
+        first_lancamento:
+          type: integer
+          title: First Lancamento
+        last_lancamento:
+          type: integer
+          title: Last Lancamento
+      type: object
+      required:
+      - ok
+      - inserted_count
+      - first_lancamento
+      - last_lancamento
+      title: FinancialCashBulkCreateResponse
+    FinancialCashCreate:
+      properties:
+        empresa:
+          type: string
+          maxLength: 70
+          minLength: 1
+          title: Empresa
+        filial:
+          type: string
+          maxLength: 70
+          minLength: 1
+          title: Filial
+        co_contabilcod:
+          anyOf:
+          - type: string
+            maxLength: 10
+          - type: 'null'
+          title: Co Contabilcod
+        co_contabil:
+          anyOf:
+          - type: string
+            maxLength: 50
+          - type: 'null'
+          title: Co Contabil
+        co_contabilrecla:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Co Contabilrecla
+        cc_analiticocd:
+          anyOf:
+          - type: string
+            maxLength: 7
+          - type: 'null'
+          title: Cc Analiticocd
+        cc_analitico:
+          anyOf:
+          - type: string
+            maxLength: 50
+          - type: 'null'
+          title: Cc Analitico
+        cc_analiticorecla:
+          anyOf:
+          - type: string
+            maxLength: 100
+          - type: 'null'
+          title: Cc Analiticorecla
+        cc_sinteticonm:
+          anyOf:
+          - type: string
+            maxLength: 50
+          - type: 'null'
+          title: Cc Sinteticonm
+        fc_codigo:
+          anyOf:
+          - type: string
+            maxLength: 15
+          - type: 'null'
+          title: Fc Codigo
+        fc_nome:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Fc Nome
+        fc_nomerecla:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Fc Nomerecla
+        fc_nomesociedade:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Fc Nomesociedade
+        dat_emissao:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dat Emissao
+        dat_vencimento:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dat Vencimento
+        dat_pagamento:
+          type: string
+          format: date
+          title: Dat Pagamento
+        dat_ano:
+          type: integer
+          maximum: 2100.0
+          minimum: 2000.0
+          title: Dat Ano
+        dat_periodo:
+          type: string
+          maxLength: 7
+          pattern: ^\d{4}-\d{2}$
+          title: Dat Periodo
+        vlr_bruto:
+          anyOf:
+          - type: number
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*(?:\d{0,16}|(?=[\d.]{1,19}0*$)\d{0,16}\.\d{0,2}0*$)
+          title: Vlr Bruto
+        vlr_liquido:
+          anyOf:
+          - type: number
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*(?:\d{0,16}|(?=[\d.]{1,19}0*$)\d{0,16}\.\d{0,2}0*$)
+          title: Vlr Liquido
+        vlr_titulo:
+          anyOf:
+          - type: number
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*(?:\d{0,16}|(?=[\d.]{1,19}0*$)\d{0,16}\.\d{0,2}0*$)
+          title: Vlr Titulo
+        vlr_pago:
+          anyOf:
+          - type: number
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*(?:\d{0,16}|(?=[\d.]{1,19}0*$)\d{0,16}\.\d{0,2}0*$)
+          title: Vlr Pago
+        vlr_abs:
+          anyOf:
+          - type: number
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*(?:\d{0,16}|(?=[\d.]{1,19}0*$)\d{0,16}\.\d{0,2}0*$)
+          title: Vlr Abs
+        descricao:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
+          title: Descricao
+        tip_movimentacao:
+          anyOf:
+          - type: string
+            maxLength: 50
+          - type: 'null'
+          title: Tip Movimentacao
+        req_original:
+          anyOf:
+          - type: string
+            maxLength: 6
+          - type: 'null'
+          title: Req Original
+        req_acumulada:
+          anyOf:
+          - type: string
+            maxLength: 100
+          - type: 'null'
+          title: Req Acumulada
+        titulo:
+          anyOf:
+          - type: string
+            maxLength: 20
+          - type: 'null'
+          title: Titulo
+        pro_codigo:
+          anyOf:
+          - type: string
+            maxLength: 100
+          - type: 'null'
+          title: Pro Codigo
+        pro_nome:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Pro Nome
+        pro_nomerecla:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Pro Nomerecla
+        cb_codigo:
+          anyOf:
+          - type: string
+            maxLength: 10
+          - type: 'null'
+          title: Cb Codigo
+        cb_completa:
+          anyOf:
+          - type: string
+            maxLength: 30
+          - type: 'null'
+          title: Cb Completa
+        cb_completarecla:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Cb Completarecla
+        pag_identificacao:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
+          title: Pag Identificacao
+        fcx_sintetico:
+          anyOf:
+          - type: string
+            maxLength: 11
+          - type: 'null'
+          title: Fcx Sintetico
+        fcx_analitico:
+          anyOf:
+          - type: string
+            maxLength: 20
+          - type: 'null'
+          title: Fcx Analitico
+        fcx_dretipo:
+          anyOf:
+          - type: string
+            maxLength: 20
+          - type: 'null'
+          title: Fcx Dretipo
+        fcx_subgrupo:
+          anyOf:
+          - type: string
+            maxLength: 30
+          - type: 'null'
+          title: Fcx Subgrupo
+        gpa_reclassif:
+          anyOf:
+          - type: string
+            maxLength: 50
+          - type: 'null'
+          title: Gpa Reclassif
+        fcx_variacao:
+          anyOf:
+          - type: string
+            maxLength: 27
+          - type: 'null'
+          title: Fcx Variacao
+        sis_origem:
+          anyOf:
+          - type: string
+            maxLength: 10
+          - type: 'null'
+          title: Sis Origem
+        ult_alteracao:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Ult Alteracao
+      additionalProperties: false
+      type: object
+      required:
+      - empresa
+      - filial
+      - dat_pagamento
+      - dat_ano
+      - dat_periodo
+      - vlr_bruto
+      - vlr_liquido
+      - vlr_titulo
+      - vlr_pago
+      - vlr_abs
+      title: FinancialCashCreate
+    FinancialCashPage:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/FinancialCashRecord'
+          type: array
+          title: Items
+        limit:
+          type: integer
+          title: Limit
+        offset:
+          type: integer
+          title: Offset
+        count:
+          type: integer
+          title: Count
+      type: object
+      required:
+      - items
+      - limit
+      - offset
+      - count
+      title: FinancialCashPage
+    FinancialCashPatch:
+      properties:
+        co_contabilrecla:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Co Contabilrecla
+        cc_analiticorecla:
+          anyOf:
+          - type: string
+            maxLength: 100
+          - type: 'null'
+          title: Cc Analiticorecla
+        cc_sinteticonm:
+          anyOf:
+          - type: string
+            maxLength: 50
+          - type: 'null'
+          title: Cc Sinteticonm
+        fc_nomerecla:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Fc Nomerecla
+        fc_nomesociedade:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Fc Nomesociedade
+        req_acumulada:
+          anyOf:
+          - type: string
+            maxLength: 100
+          - type: 'null'
+          title: Req Acumulada
+        pro_nomerecla:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Pro Nomerecla
+        cb_completarecla:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Cb Completarecla
+        fcx_analitico:
+          anyOf:
+          - type: string
+            maxLength: 20
+          - type: 'null'
+          title: Fcx Analitico
+        fcx_dretipo:
+          anyOf:
+          - type: string
+            maxLength: 20
+          - type: 'null'
+          title: Fcx Dretipo
+        fcx_subgrupo:
+          anyOf:
+          - type: string
+            maxLength: 30
+          - type: 'null'
+          title: Fcx Subgrupo
+        gpa_reclassif:
+          anyOf:
+          - type: string
+            maxLength: 50
+          - type: 'null'
+          title: Gpa Reclassif
+        fcx_variacao:
+          anyOf:
+          - type: string
+            maxLength: 27
+          - type: 'null'
+          title: Fcx Variacao
+      additionalProperties: false
+      type: object
+      title: FinancialCashPatch
+    FinancialCashPatchResponse:
+      properties:
+        ok:
+          type: boolean
+          title: Ok
+        lancamento:
+          type: integer
+          title: Lancamento
+        updated_fields:
+          items:
+            type: string
+          type: array
+          title: Updated Fields
+        ult_alteracao:
+          type: string
+          format: date-time
+          title: Ult Alteracao
+      type: object
+      required:
+      - ok
+      - lancamento
+      - updated_fields
+      - ult_alteracao
+      title: FinancialCashPatchResponse
+    FinancialCashRecord:
+      properties:
+        lancamento:
+          type: integer
+          title: Lancamento
+          description: Identificador unico do lancamento
+        empresa:
+          type: string
+          title: Empresa
+          description: Empresa responsavel pelo lancamento
+        filial:
+          type: string
+          title: Filial
+          description: Filial responsavel pelo lancamento
+        co_contabilcod:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Co Contabilcod
+          description: Codigo da conta contabil original
+        co_contabil:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Co Contabil
+          description: Descricao da conta contabil original
+        co_contabilrecla:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Co Contabilrecla
+          description: Conta contabil padronizada
+        cc_analiticocd:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cc Analiticocd
+          description: Codigo do centro de custo analitico
+        cc_analitico:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cc Analitico
+          description: Centro de custo analitico original
+        cc_analiticorecla:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cc Analiticorecla
+          description: Centro de custo analitico padronizado
+        cc_sinteticonm:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cc Sinteticonm
+          description: Centro de custo sintetico
+        fc_codigo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Fc Codigo
+          description: Codigo do fornecedor ou cliente
+        fc_nome:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Fc Nome
+          description: Nome original do fornecedor ou cliente
+        fc_nomerecla:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Fc Nomerecla
+          description: Nome padronizado do fornecedor ou cliente
+        fc_nomesociedade:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Fc Nomesociedade
+          description: Grupo ou sociedade do fornecedor ou cliente
+        dat_emissao:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dat Emissao
+          description: Data de emissao
+        dat_vencimento:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dat Vencimento
+          description: Data de vencimento
+        dat_pagamento:
+          type: string
+          format: date
+          title: Dat Pagamento
+          description: Data de pagamento usada no filtro obrigatorio
+        dat_ano:
+          type: integer
+          title: Dat Ano
+          description: Ano contabil
+        dat_periodo:
+          type: string
+          title: Dat Periodo
+          description: Periodo contabil no formato YYYY-MM
+        vlr_bruto:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Vlr Bruto
+          description: Valor bruto
+        vlr_liquido:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Vlr Liquido
+          description: Valor liquido
+        vlr_titulo:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Vlr Titulo
+          description: Valor do titulo
+        vlr_pago:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Vlr Pago
+          description: Valor pago
+        vlr_abs:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Vlr Abs
+          description: Valor absoluto usado nas analises
+        descricao:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Descricao
+          description: Descricao do lancamento
+        tip_movimentacao:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tip Movimentacao
+          description: Tipo de movimentacao financeira
+        req_original:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Req Original
+          description: Codigo original da requisicao
+        req_acumulada:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Req Acumulada
+          description: Requisicao consolidada ou corrigida
+        titulo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Titulo
+          description: Numero ou identificador do titulo
+        pro_codigo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pro Codigo
+          description: Codigo do projeto
+        pro_nome:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pro Nome
+          description: Nome original do projeto
+        pro_nomerecla:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pro Nomerecla
+          description: Nome padronizado do projeto
+        cb_codigo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cb Codigo
+          description: Codigo da conta bancaria
+        cb_completa:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cb Completa
+          description: Descricao original da conta bancaria
+        cb_completarecla:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cb Completarecla
+          description: Conta bancaria padronizada
+        pag_identificacao:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pag Identificacao
+          description: Identificacao do pagamento
+        fcx_sintetico:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Fcx Sintetico
+          description: Classificacao financeira sintetica
+        fcx_analitico:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Fcx Analitico
+          description: Classificacao financeira analitica
+        fcx_dretipo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Fcx Dretipo
+          description: Tipo de demonstracao de resultado
+        fcx_subgrupo:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Fcx Subgrupo
+          description: Subgrupo financeiro
+        gpa_reclassif:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Gpa Reclassif
+          description: Classificacao geral
+        fcx_variacao:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Fcx Variacao
+          description: Tipagem ou variacao financeira
+        sis_origem:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sis Origem
+          description: Sistema de origem
+        ult_alteracao:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Ult Alteracao
+          description: Data e hora da ultima alteracao
+      type: object
+      required:
+      - lancamento
+      - empresa
+      - filial
+      - dat_pagamento
+      - dat_ano
+      - dat_periodo
+      - vlr_bruto
+      - vlr_liquido
+      - vlr_titulo
+      - vlr_pago
+      - vlr_abs
+      title: FinancialCashRecord
     HTTPValidationError:
       properties:
         detail:
@@ -1729,8 +2629,7 @@ components:
           maxLength: 40
           minLength: 1
           title: Contato
-          description: Valor usado para localizar a cobrança; aceita + e pontuação,
-            mas será normalizado para números
+          description: Valor usado para localizar a cobrança; aceita + e pontuação, mas será normalizado para números
           examples:
           - '+5521999999999'
         status:
@@ -1792,15 +2691,13 @@ components:
           - cpf
           - cnpj
           title: Tipo
-          description: Tipo de documento que será validado. Use 'cpf' para CPF ou
-            'cnpj' para CNPJ
+          description: Tipo de documento que será validado. Use 'cpf' para CPF ou 'cnpj' para CNPJ
           examples:
           - cpf
         valor:
           type: string
           title: Valor
-          description: Documento a ser validado exatamente como foi recebido pela
-            aplicação de origem
+          description: Documento a ser validado exatamente como foi recebido pela aplicação de origem
           examples:
           - '12345678909'
       type: object
@@ -1833,8 +2730,7 @@ components:
       properties:
         nome:
           title: Nome
-          description: Nome a ser validado, exatamente como foi recebido pelo sistema
-            de origem
+          description: Nome a ser validado, exatamente como foi recebido pelo sistema de origem
           examples:
           - Maria da Silva
       type: object
@@ -1863,8 +2759,7 @@ components:
         motivo_nome_invalido:
           type: string
           title: Motivo Nome Invalido
-          description: Motivo da rejeição; retorna uma string vazia quando o nome
-            é válido
+          description: Motivo da rejeição; retorna uma string vazia quando o nome é válido
       type: object
       required:
       - nome_original

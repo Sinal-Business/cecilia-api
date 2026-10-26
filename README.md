@@ -531,6 +531,22 @@ Hotspot CPF and parking vehicle plate fields are confidential. Clients must
 
 request only the necessary period and avoid logging or redistributing them.
 
+### Sinal - Movimentacoes Financeiras (Caixa)
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/sinal/finance/cash-transactions` | Consulta paginada por data de pagamento e filtros financeiros. |
+| `POST` | `/sinal/finance/cash-transactions` | Insere de 1 a 500 lancamentos; a API reserva IDs sequenciais a partir de `MAX(lancamento)` em transacao serializavel. |
+| `PATCH` | `/sinal/finance/cash-transactions/{lancamento}` | Atualiza somente campos de classificacao autorizados e registra `ult_alteracao`. |
+
+O GET exige `start_date` e `end_date`, aplicados sobre `dat_pagamento`, com
+periodo maximo de 31 dias. `due_start_date` e `due_end_date` filtram
+`dat_vencimento` e devem ser enviados juntos. Os demais filtros sao exatos.
+
+O PATCH nao altera valores, datas, empresa, filial, titulo ou identificadores.
+Essas mudancas devem ser solicitadas ao responsavel tecnico. Todos os tres
+metodos exigem o `TOKEN` primario; `TOKEN_SECONDARY` nao possui acesso.
+
 ### Shopping sales
 
 `GET /shopping/finance/sales` exposes `spro_financeiro_vendas` with bearer

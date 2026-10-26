@@ -3,6 +3,7 @@ from fastapi.openapi.docs import get_redoc_html
 from routers.adm import router as adm_router
 from routers.chatbots import router as chatbots_router
 from routers.health import router as health_router
+from routers.sinal import router as sinal_router
 from routers.shopping import router as shopping_router
 from routers.validations import router as validations_router
 
@@ -89,4 +90,5 @@ app.include_router(validations_router)
 app.include_router(adm_router)
 app.include_router(chatbots_router)
 app.include_router(shopping_router)
+app.include_router(sinal_router)
 app.include_router(health_router)
